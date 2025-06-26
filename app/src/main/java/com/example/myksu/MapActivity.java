@@ -2,6 +2,7 @@ package com.example.myksu;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -67,6 +68,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             } else {
                 Toast.makeText(this, "Местоположение не получено", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        // Add navigation button click handler
+        ImageButton navigationButton = findViewById(R.id.navigation_button);
+        navigationButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MapActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish(); // Optional: close current activity if you don't want to keep it in back stack
         });
     }
 
