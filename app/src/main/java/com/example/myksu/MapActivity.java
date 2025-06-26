@@ -9,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
@@ -25,17 +26,26 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
-    private final int LOCATION_PERMISSION_REQUEST = 1;
+    private static final int LOCATION_PERMISSION_REQUEST = 1;
     private LatLng currentUserLocation;
+    private final Map<Marker, Boolean> buildingMarkers = new HashMap<>();
+    private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>();
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+    private final Map<Marker, Boolean> clickedMarkers = new HashMap<>();
+    private Marker currentSelectedMarker = null;
+    private static final float PROXIMITY_RADIUS = 52;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,8 +73,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+        mMap.setOnMarkerClickListener(this);
 
-        List<LatLng> locations = Arrays.asList(
+        List<LatLng> buildingLocations = Arrays.asList(
                 new LatLng(57.759625, 40.942470),  // Главный Корпус
                 new LatLng(57.736841, 40.920328),  // Е Корпус
                 new LatLng(57.761681, 40.940083),  // Б Корпус
@@ -78,7 +89,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 new LatLng(57.800863, 41.003536)   // ИПП Корпус
         );
 
-        List<String> titles = Arrays.asList(
+        List<String> buildingTitles = Arrays.asList(
                 "Главный корпус",
                 "Е корпус",
                 "Б корпус",
@@ -92,15 +103,51 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 "ИПП корпус"
         );
 
-        for (int i = 0; i < locations.size(); i++) {
-            mMap.addMarker(new MarkerOptions()
-                    .position(locations.get(i))
-                    .title(titles.get(i))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)) // ← кастомная иконка
+        for (int i = 0; i < buildingLocations.size(); i++) {
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(buildingLocations.get(i))
+                    .title(buildingTitles.get(i))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
             );
+            if (marker != null) {
+                buildingMarkers.put(marker, false);
+                clickedMarkers.put(marker, false);
+            }
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(locations.get(0), 14));
+        List<LatLng> dormitoryLocations = Arrays.asList(
+                new LatLng(57.754431, 40.952182),  // Общежитие 1
+                new LatLng(57.753951, 40.954221),  // Общежитие 2
+                new LatLng(57.736553, 40.920300),  // Общежитие 3
+                new LatLng(57.755104, 40.955613),  // Общежитие 4
+                new LatLng(57.755233, 40.954607),  // Общежитие 5
+                new LatLng(57.767923, 40.918962)   // Общежитие 6
+        );
+
+        List<String> dormitoryTitles = Arrays.asList(
+                "Общежитие №1",
+                "Общежитие №2",
+                "Общежитие №3",
+                "Общежитие №4",
+                "Общежитие №5",
+                "Общежитие №6"
+        );
+
+        for (int i = 0; i < dormitoryLocations.size(); i++) {
+            Marker marker = mMap.addMarker(new MarkerOptions()
+                    .position(dormitoryLocations.get(i))
+                    .title(dormitoryTitles.get(i))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two))
+            );
+            if (marker != null) {
+                dormitoryMarkers.put(marker, false);
+                clickedMarkers.put(marker, false);
+            }
+        }
+
+        if (!buildingLocations.isEmpty()) {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(buildingLocations.get(0), 14));
+        }
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         enableMyLocation();
         startLocationUpdates();
@@ -108,7 +155,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
+                == PackageManager.PERMISSION_GRANTED && mMap != null) {
             mMap.setMyLocationEnabled(true);
         } else {
             ActivityCompat.requestPermissions(this,
@@ -123,10 +170,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             return;
         }
 
-        LocationRequest locationRequest = LocationRequest.create()
-                .setInterval(10000)
-                .setFastestInterval(5000)
-                .setPriority(Priority.PRIORITY_HIGH_ACCURACY);
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+                .setMinUpdateIntervalMillis(5000)
+                .build();
 
         fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
             @Override
@@ -134,9 +180,79 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 if (locationResult == null) return;
                 for (Location location : locationResult.getLocations()) {
                     currentUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    checkProximityToBuildings();
                 }
             }
         }, Looper.getMainLooper());
+    }
+
+    private void checkProximityToBuildings() {
+        if (currentUserLocation == null || mMap == null) return;
+
+        for (Map.Entry<Marker, Boolean> entry : buildingMarkers.entrySet()) {
+            Marker marker = entry.getKey();
+
+            if (marker.equals(currentSelectedMarker)) continue;
+
+            float[] results = new float[1];
+            Location.distanceBetween(
+                    currentUserLocation.latitude,
+                    currentUserLocation.longitude,
+                    marker.getPosition().latitude,
+                    marker.getPosition().longitude,
+                    results
+            );
+
+            if (results[0] <= PROXIMITY_RADIUS) {
+                if (!entry.getValue()) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
+                    buildingMarkers.put(marker, true);
+                }
+            } else {
+                if (entry.getValue()) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+                    buildingMarkers.put(marker, false);
+                }
+            }
+        }
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        boolean isCurrentlySelected = marker.equals(currentSelectedMarker);
+
+        if (currentSelectedMarker != null && !currentSelectedMarker.equals(marker)) {
+            resetMarkerIcon(currentSelectedMarker);
+        }
+
+        if (isCurrentlySelected) {
+            resetMarkerIcon(marker);
+            currentSelectedMarker = null;
+        } else {
+            if (buildingMarkers.containsKey(marker)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
+            } else if (dormitoryMarkers.containsKey(marker)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
+            }
+            currentSelectedMarker = marker;
+        }
+
+        marker.showInfoWindow();
+        return true;
+    }
+
+    private void resetMarkerIcon(@Nullable Marker marker) {
+        if (marker == null) return;
+
+        if (buildingMarkers.containsKey(marker)) {
+            if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
+            } else {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+            }
+        } else if (dormitoryMarkers.containsKey(marker)) {
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two));
+        }
     }
 
     @Override
