@@ -1,6 +1,7 @@
 package com.example.myksu;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -42,7 +43,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private LatLng currentUserLocation;
     private final Map<Marker, Boolean> buildingMarkers = new HashMap<>();
     private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>();
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Marker, Boolean> clickedMarkers = new HashMap<>();
     private Marker currentSelectedMarker = null;
     private static final float PROXIMITY_RADIUS = 52;
@@ -76,17 +76,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this);
 
         List<LatLng> buildingLocations = Arrays.asList(
-                new LatLng(57.759625, 40.942470),  // Главный Корпус
-                new LatLng(57.736841, 40.920328),  // Е Корпус
-                new LatLng(57.761681, 40.940083),  // Б Корпус
-                new LatLng(57.760810, 40.940021),  // В Корпус
-                new LatLng(57.760810, 40.940021),  // Д Корпус
-                new LatLng(57.766919, 40.918577),  // А1 Корпус
-                new LatLng(57.767411, 40.917096),  // Г1 Корпус
-                new LatLng(57.767802, 40.917167),  // В1 Корпус
-                new LatLng(57.768314, 40.915687),  // Б1 Корпус
-                new LatLng(57.778410, 40.913353),  // Спортивный Корпус
-                new LatLng(57.800863, 41.003536)   // ИПП Корпус
+                new LatLng(57.759625, 40.942470),
+                new LatLng(57.736841, 40.920328),
+                new LatLng(57.761681, 40.940083),
+                new LatLng(57.760810, 40.940021),
+                new LatLng(57.760810, 40.940021),
+                new LatLng(57.766919, 40.918577),
+                new LatLng(57.767411, 40.917096),
+                new LatLng(57.767802, 40.917167),
+                new LatLng(57.768314, 40.915687),
+                new LatLng(57.778410, 40.913353),
+                new LatLng(57.800863, 41.003536)
         );
 
         List<String> buildingTitles = Arrays.asList(
@@ -104,10 +104,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         );
 
         for (int i = 0; i < buildingLocations.size(); i++) {
+            int iconRes = (i == 0) ? R.drawable.marker : R.drawable.non_marker;
+
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(buildingLocations.get(i))
                     .title(buildingTitles.get(i))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker))
+                    .icon(BitmapDescriptorFactory.fromResource(iconRes))
             );
             if (marker != null) {
                 buildingMarkers.put(marker, false);
@@ -116,12 +118,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
 
         List<LatLng> dormitoryLocations = Arrays.asList(
-                new LatLng(57.754431, 40.952182),  // Общежитие 1
-                new LatLng(57.753951, 40.954221),  // Общежитие 2
-                new LatLng(57.736553, 40.920300),  // Общежитие 3
-                new LatLng(57.755104, 40.955613),  // Общежитие 4
-                new LatLng(57.755233, 40.954607),  // Общежитие 5
-                new LatLng(57.767923, 40.918962)   // Общежитие 6
+                new LatLng(57.754431, 40.952182),
+                new LatLng(57.753951, 40.954221),
+                new LatLng(57.736553, 40.920300),
+                new LatLng(57.755104, 40.955613),
+                new LatLng(57.755233, 40.954607),
+                new LatLng(57.767923, 40.918962)
         );
 
         List<String> dormitoryTitles = Arrays.asList(
@@ -148,9 +150,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (!buildingLocations.isEmpty()) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(buildingLocations.get(0), 14));
         }
+
         mMap.getUiSettings().setMyLocationButtonEnabled(false);
         enableMyLocation();
         startLocationUpdates();
+    }
+
+    private void showBuildingDialog(String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void enableMyLocation() {
@@ -210,7 +221,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
             } else {
                 if (entry.getValue()) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
+                    int iconRes = marker.getTitle().equals("Главный корпус")
+                            ? R.drawable.marker
+                            : R.drawable.non_marker;
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
                     buildingMarkers.put(marker, false);
                 }
             }
@@ -231,9 +245,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         } else {
             if (buildingMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
+
+                if (marker.getTitle().equals("ИПП корпус")) {
+                    showBuildingDialog("Корпус недоступен",
+                            "Чтобы активировать данный корпус, нужно пройти все корпуса");
+                } else if (!marker.getTitle().equals("Главный корпус")) {
+                    showBuildingDialog("Корпус недоступен",
+                            "Чтобы активировать данный корпус, нужно для начала пройти Главный корпус");
+                }
+
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
+                // Больше не показываем всплывающие окна для общежитий
             }
+
             currentSelectedMarker = marker;
         }
 
@@ -245,11 +270,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         if (marker == null) return;
 
         if (buildingMarkers.containsKey(marker)) {
-            if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
-            } else {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker));
-            }
+            int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
+                    ? R.drawable.marker_selected
+                    : (marker.getTitle().equals("Главный корпус")
+                    ? R.drawable.marker
+                    : R.drawable.non_marker);
+            marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
         } else if (dormitoryMarkers.containsKey(marker)) {
             marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two));
         }
