@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         // Настройка кнопки "Начать"
         ImageButton startButton = findViewById(R.id.startButton);
         startButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+            Intent intent = new Intent(MainActivity.this, PuzzleActivity.class);
             startActivity(intent);
         });
 
