@@ -7,7 +7,11 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -38,15 +42,16 @@ import java.util.Map;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    private static final int LOCATION_PERMISSION_REQUEST = 1;
+    private static final float PROXIMITY_RADIUS = 52;
+
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
-    private static final int LOCATION_PERMISSION_REQUEST = 1;
     private LatLng currentUserLocation;
     private final Map<Marker, Boolean> buildingMarkers = new HashMap<>();
     private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>();
     private final Map<Marker, Boolean> clickedMarkers = new HashMap<>();
-    private Marker currentSelectedMarker = null;
-    private static final float PROXIMITY_RADIUS = 52;
+    private Marker currentSelectedMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +75,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        // Add navigation button click handler
         ImageButton navigationButton = findViewById(R.id.navigation_button);
         navigationButton.setOnClickListener(v -> {
             Intent intent = new Intent(MapActivity.this, MainActivity.class);
             startActivity(intent);
-            finish(); // Optional: close current activity if you don't want to keep it in back stack
+            finish();
         });
     }
 
@@ -165,12 +169,73 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         startLocationUpdates();
     }
 
-    private void showBuildingDialog(String title, String message) {
-        new AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .show();
+    private void showCustomDialog(String title, String message, boolean showRouteButton) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.custom_dialog_layout, null);
+        builder.setView(dialogView);
+
+        TextView dialogTitle = dialogView.findViewById(R.id.dialog_title);
+        TextView dialogMessage = dialogView.findViewById(R.id.dialog_message);
+        Button routeButton = dialogView.findViewById(R.id.route_button);
+        ImageButton closeButton = dialogView.findViewById(R.id.closeButton);
+
+        dialogTitle.setText(title);
+        dialogMessage.setText(message);
+
+        if (showRouteButton) {
+            routeButton.setVisibility(View.VISIBLE);
+            routeButton.setOnClickListener(v ->
+                    Toast.makeText(this, "Построение маршрута", Toast.LENGTH_SHORT).show()
+            );
+        } else {
+            routeButton.setVisibility(View.GONE);
+        }
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+        dialog.show();
+    }
+
+    @Override
+    public boolean onMarkerClick(@NonNull Marker marker) {
+        boolean isCurrentlySelected = marker.equals(currentSelectedMarker);
+
+        if (currentSelectedMarker != null && !currentSelectedMarker.equals(marker)) {
+            resetMarkerIcon(currentSelectedMarker);
+        }
+
+        if (isCurrentlySelected) {
+            resetMarkerIcon(marker);
+            currentSelectedMarker = null;
+        } else {
+            if (buildingMarkers.containsKey(marker)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
+
+                if ("ИПП корпус".equals(marker.getTitle())) {
+                    showCustomDialog("Корпус недоступен",
+                            "Чтобы активировать данный корпус, нужно пройти оставшиеся корпуса КГУ",
+                            false);
+                } else if ("Главный корпус".equals(marker.getTitle())) {
+                    showCustomDialog("Корпус недоступен",
+                            "Чтобы получить информацию об этом корпусе, подойдите к нему по GPS",
+                            true);
+                } else {
+                    showCustomDialog("Корпус недоступен",
+                            "Чтобы активировать данный корпус, нужно для начала пройти Главный корпус",
+                            true);
+                }
+            } else if (dormitoryMarkers.containsKey(marker)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
+            }
+
+            currentSelectedMarker = marker;
+        }
+
+        marker.showInfoWindow();
+        return true;
     }
 
     private void enableMyLocation() {
@@ -197,7 +262,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
             @Override
             public void onLocationResult(@NonNull LocationResult locationResult) {
-                if (locationResult == null) return;
+                if (locationResult == null) {
+                    return;
+                }
                 for (Location location : locationResult.getLocations()) {
                     currentUserLocation = new LatLng(location.getLatitude(), location.getLongitude());
                     checkProximityToBuildings();
@@ -207,12 +274,16 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     }
 
     private void checkProximityToBuildings() {
-        if (currentUserLocation == null || mMap == null) return;
+        if (currentUserLocation == null || mMap == null) {
+            return;
+        }
 
         for (Map.Entry<Marker, Boolean> entry : buildingMarkers.entrySet()) {
             Marker marker = entry.getKey();
 
-            if (marker.equals(currentSelectedMarker)) continue;
+            if (marker.equals(currentSelectedMarker)) {
+                continue;
+            }
 
             float[] results = new float[1];
             Location.distanceBetween(
@@ -230,7 +301,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
             } else {
                 if (entry.getValue()) {
-                    int iconRes = marker.getTitle().equals("Главный корпус")
+                    int iconRes = "Главный корпус".equals(marker.getTitle())
                             ? R.drawable.marker
                             : R.drawable.non_marker;
                     marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
@@ -240,48 +311,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    @Override
-    public boolean onMarkerClick(@NonNull Marker marker) {
-        boolean isCurrentlySelected = marker.equals(currentSelectedMarker);
-
-        if (currentSelectedMarker != null && !currentSelectedMarker.equals(marker)) {
-            resetMarkerIcon(currentSelectedMarker);
-        }
-
-        if (isCurrentlySelected) {
-            resetMarkerIcon(marker);
-            currentSelectedMarker = null;
-        } else {
-            if (buildingMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
-
-                if (marker.getTitle().equals("ИПП корпус")) {
-                    showBuildingDialog("Корпус недоступен",
-                            "Чтобы активировать данный корпус, нужно пройти все корпуса");
-                } else if (!marker.getTitle().equals("Главный корпус")) {
-                    showBuildingDialog("Корпус недоступен",
-                            "Чтобы активировать данный корпус, нужно для начала пройти Главный корпус");
-                }
-
-            } else if (dormitoryMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
-                // Больше не показываем всплывающие окна для общежитий
-            }
-
-            currentSelectedMarker = marker;
-        }
-
-        marker.showInfoWindow();
-        return true;
-    }
-
     private void resetMarkerIcon(@Nullable Marker marker) {
-        if (marker == null) return;
+        if (marker == null) {
+            return;
+        }
 
         if (buildingMarkers.containsKey(marker)) {
             int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
                     ? R.drawable.marker_selected
-                    : (marker.getTitle().equals("Главный корпус")
+                    : ("Главный корпус".equals(marker.getTitle())
                     ? R.drawable.marker
                     : R.drawable.non_marker);
             marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
