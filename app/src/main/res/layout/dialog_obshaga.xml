@@ -1,0 +1,152 @@
+<!-- dialog_obshaga.xml -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dialog_rounded_background"
+    android:padding="0dp"
+    android:layout_marginHorizontal="6dp">
+
+    <!-- Верхняя синяя часть (40%) -->
+    <LinearLayout
+        android:id="@+id/topLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#3164F7"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.4">
+
+        <!-- Изображение с отступами -->
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="16dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/image_rounded_corners"/>
+    </LinearLayout>
+
+    <!-- Нижняя белая часть (60%) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/topLayout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Заголовки -->
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textColor="#000000"
+            android:textStyle="bold"
+            android:padding="6dp"
+            android:paddingBottom="0dp"
+            android:fontFamily="@font/nunito_black"/>
+
+        <TextView
+            android:id="@+id/subtitleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textColor="#666666"
+            android:padding="6dp"
+            android:fontFamily="@font/nunito_black"/>
+
+        <!-- Прокручиваемый контент -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="16dp"
+            android:paddingTop="0dp">
+
+            <TextView
+                android:id="@+id/contentText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#333333"
+                android:fontFamily="@font/nunito_bold"
+                android:textSize="16sp"/>
+        </ScrollView>
+
+        <!-- Контейнер для кнопок -->
+        <LinearLayout
+            android:id="@+id/buttonsLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp"
+            android:padding="16dp"
+            android:paddingTop="0dp">
+
+            <!-- Кнопка "Подробнее" с текстом поверх иконки -->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <ImageButton
+                    android:id="@+id/detailsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:contentDescription="@string/details"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_details" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Подробнее"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/nunito_bold"/>
+            </RelativeLayout>
+
+            <!-- Кнопка "Маршрут" с текстом поверх иконки -->
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless">
+
+                <ImageButton
+                    android:id="@+id/routeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_route"
+                    android:scaleType="centerInside"
+                    android:background="@null"
+                    android:contentDescription="@string/route"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Маршрут"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/nunito_bold"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
