@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="315dp"
     android:layout_height="210dp"
-    android:background="@drawable/ic_settings_large"
+    android:background="@drawable/btn_text_settings_large"
     android:padding="16dp">
 
     <!-- Заголовок "Настройки" -->
@@ -32,7 +32,7 @@
         android:layout_marginEnd="13dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Закрыть"
-        android:src="@drawable/ic_close2" />
+        android:src="@drawable/icons_close" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -77,7 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
-            android:src="@drawable/exit"
+            android:src="@drawable/btn_text_exit"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Выход из игры" />
 
