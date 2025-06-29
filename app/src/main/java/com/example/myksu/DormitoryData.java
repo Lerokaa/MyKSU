@@ -109,4 +109,21 @@ public class DormitoryData {
         }
         return null; // Если не найдено
     }
+
+    // Новый метод: парсит JSON и сразу возвращает общежитие по ID
+    public static Dormitory parseSingleDormitory(InputStream inputStream, int targetId) {
+        Gson gson = new GsonBuilder().create();
+        InputStreamReader reader = new InputStreamReader(inputStream);
+
+        // Парсим весь JSON, но сразу ищем нужное общежитие
+        DormitoriesResponse response = gson.fromJson(reader, DormitoriesResponse.class);
+        if (response.getDormitories() != null) {
+            for (Dormitory dorm : response.getDormitories()) {
+                if (dorm.getId() == targetId) {
+                    return dorm; // Возвращаем сразу, как нашли
+                }
+            }
+        }
+        return null; // Если не найдено
+    }
 }
