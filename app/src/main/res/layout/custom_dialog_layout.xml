@@ -12,7 +12,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="10dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_close2"
+        android:src="@drawable/icons_close"
         android:contentDescription="@string/close_button_description"
         android:scaleType="center"
         android:padding="3dp" />

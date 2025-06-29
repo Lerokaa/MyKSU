@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -39,16 +41,30 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     private static final float PROXIMITY_RADIUS = 52;
+    private static final String DIRECTIONS_API_KEY = "AIzaSyAOL_tozvB5hMNVQJFFQe8Cz2tFA_pxbOA"; // Замените на ваш API ключ
+    private static final String DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json?";
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -57,6 +73,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>();
     private final Map<Marker, Boolean> clickedMarkers = new HashMap<>();
     private Marker currentSelectedMarker;
+    private Polyline currentRoute;
+    private final Map<Marker, Integer> buildingIds = new HashMap<>();
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,7 +106,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             finish();
         });
 
-        // Настройка кнопки настроек
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(v -> showSettingsDialog());
     }
@@ -98,33 +116,34 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this);
 
         List<LatLng> buildingLocations = Arrays.asList(
-                new LatLng(57.759625, 40.942470),
-                new LatLng(57.736841, 40.920328),
-                new LatLng(57.761681, 40.940083),
-                new LatLng(57.760810, 40.940021),
-                new LatLng(57.760810, 40.940021),
-                new LatLng(57.766919, 40.918577),
-                new LatLng(57.767411, 40.917096),
-                new LatLng(57.767802, 40.917167),
-                new LatLng(57.768314, 40.915687),
-                new LatLng(57.778410, 40.913353),
-                new LatLng(57.800863, 41.003536)
+                new LatLng(57.759625, 40.942470),  // Главный корпус (ID: 1)
+                new LatLng(57.766919, 40.918577),  // А1 корпус (ID: 2)
+                new LatLng(57.761681, 40.940083),  // Б корпус (ID: 3)
+                new LatLng(57.768314, 40.915687),  // Б1 корпус (ID: 4)
+                new LatLng(57.760810, 40.940021),  // В корпус (ID: 5)
+                new LatLng(57.767802, 40.917167), // В1 корпус (ID: 6)
+                new LatLng(57.767411, 40.917096),  // Г1 корпус (ID: 7)
+                new LatLng(57.760810, 40.940021),  // Д корпус (ID: 8)
+                new LatLng(57.736841, 40.920328), // Е корпус (ID: 9)
+                new LatLng(57.778410, 40.913353), // Спортивный корпус (ID: 10)
+                new LatLng(57.800863, 41.003536)  // ИПП корпус (ID: 11)
         );
 
         List<String> buildingTitles = Arrays.asList(
                 "Главный корпус",
-                "Е корпус",
-                "Б корпус",
-                "В корпус",
-                "Д корпус",
                 "А1 корпус",
-                "Г1 корпус",
-                "В1 корпус",
+                "Б корпус",
                 "Б1 корпус",
+                "В корпус",
+                "В1 корпус",
+                "Г1 корпус",
+                "Д корпус",
+                "Е корпус",
                 "Спортивный корпус",
                 "ИПП корпус"
         );
 
+        // Добавляем маркеры с ID корпусов (1-11)
         for (int i = 0; i < buildingLocations.size(); i++) {
             int iconRes = (i == 0) ? R.drawable.btn_icons_marker : R.drawable.btn_icons_non_marker;
 
@@ -133,9 +152,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     .title(buildingTitles.get(i))
                     .icon(BitmapDescriptorFactory.fromResource(iconRes))
             );
+
             if (marker != null) {
                 buildingMarkers.put(marker, false);
                 clickedMarkers.put(marker, false);
+                buildingIds.put(marker, i + 1); // ID от 1 до 11
             }
         }
 
@@ -178,7 +199,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         startLocationUpdates();
     }
 
-    private void showCustomDialog(String title, String message, boolean showRouteButton) {
+    private void showCustomDialog(String title, String message, boolean showRouteButton, Marker marker) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.custom_dialog_layout, null);
@@ -194,9 +215,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         if (showRouteButton) {
             routeButton.setVisibility(View.VISIBLE);
-            routeButton.setOnClickListener(v ->
-                    Toast.makeText(this, "Построение маршрута", Toast.LENGTH_SHORT).show()
-            );
+            routeButton.setOnClickListener(v -> {
+                buildRouteToBuilding(marker);
+                ((AlertDialog) v.getTag()).dismiss();
+            });
+            routeButton.setTag(builder.create());
         } else {
             routeButton.setVisibility(View.GONE);
         }
@@ -207,6 +230,81 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         closeButton.setOnClickListener(v -> dialog.dismiss());
         dialog.show();
     }
+
+    private void buildRouteToBuilding(Marker destinationMarker) {
+        if (currentUserLocation == null) {
+            Toast.makeText(this, "Не удалось определить ваше местоположение", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (currentRoute != null) {
+            currentRoute.remove();
+        }
+
+        String origin = currentUserLocation.latitude + "," + currentUserLocation.longitude;
+        String destination = destinationMarker.getPosition().latitude + "," + destinationMarker.getPosition().longitude;
+        String url = DIRECTIONS_URL + "origin=" + origin + "&destination=" + destination +
+                "&mode=walking&key=" + DIRECTIONS_API_KEY;
+
+        Request request = new Request.Builder().url(url).build();
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                runOnUiThread(() ->
+                        Toast.makeText(MapActivity.this, "Ошибка при подключении к серверу маршрута", Toast.LENGTH_SHORT).show()
+                );
+                Log.e("RouteError", "Failed to fetch route", e);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    runOnUiThread(() ->
+                            Toast.makeText(MapActivity.this, "Сервер вернул ошибку маршрута", Toast.LENGTH_SHORT).show()
+                    );
+                    Log.e("RouteError", "Unsuccessful response: " + response.code());
+                    return;
+                }
+
+                try {
+                    String responseData = response.body() != null ? response.body().string() : "";
+                    JSONObject json = new JSONObject(responseData);
+
+                    if (!json.has("routes") || json.getJSONArray("routes").length() == 0) {
+                        runOnUiThread(() ->
+                                Toast.makeText(MapActivity.this, "Маршрут не найден", Toast.LENGTH_SHORT).show()
+                        );
+                        Log.w("RouteError", "No routes found in response");
+                        return;
+                    }
+
+                    String points = json.getJSONArray("routes")
+                            .getJSONObject(0)
+                            .getJSONObject("overview_polyline")
+                            .getString("points");
+
+                    List<LatLng> path = PolyUtil.decode(points);
+
+                    runOnUiThread(() -> {
+                        PolylineOptions options = new PolylineOptions()
+                                .addAll(path)
+                                .width(10)
+                                .color(Color.BLUE)
+                                .geodesic(true);
+
+                        currentRoute = mMap.addPolyline(options);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationMarker.getPosition(), 15));
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() ->
+                            Toast.makeText(MapActivity.this, "Ошибка обработки маршрута", Toast.LENGTH_SHORT).show()
+                    );
+                    Log.e("RouteError", "Exception parsing route", e);
+                }
+            }
+        });
+    }
+
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
@@ -223,21 +321,25 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             if (buildingMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
 
-                if ("ИПП корпус".equals(marker.getTitle())) {
+                int buildingId = buildingIds.get(marker);
+                String buildingName = marker.getTitle();
+
+                if ("ИПП корпус".equals(buildingName)) {
                     showCustomDialog("Корпус недоступен",
                             "Чтобы активировать данный корпус, нужно пройти оставшиеся корпуса КГУ",
-                            false);
-                } else if ("Главный корпус".equals(marker.getTitle())) {
+                            false, marker);
+                } else if ("Главный корпус".equals(buildingName)) {
                     showCustomDialog("Корпус недоступен",
                             "Чтобы получить информацию об этом корпусе, подойдите к нему по GPS",
-                            true);
+                            true, marker);
                 } else {
                     showCustomDialog("Корпус недоступен",
                             "Чтобы активировать данный корпус, нужно для начала пройти Главный корпус",
-                            true);
+                            true, marker);
                 }
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
+                showCustomDialog(marker.getTitle(), "Общежитие", false, marker);
             }
 
             currentSelectedMarker = marker;
@@ -356,30 +458,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         Dialog settingsDialog = new Dialog(this);
         settingsDialog.setContentView(R.layout.dialog_settings);
 
-        // Убираем стандартный заголовок и делаем прозрачный фон
         settingsDialog.setTitle(null);
         settingsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
-        // Настраиваем размеры диалога и затемнение
         Window window = settingsDialog.getWindow();
         if (window != null) {
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(window.getAttributes());
-            // Устанавливаем фиксированные размеры (315x210 dp)
             lp.width = (int) (315 * getResources().getDisplayMetrics().density);
             lp.height = (int) (210 * getResources().getDisplayMetrics().density);
-            // Устанавливаем уровень затемнения (0.7f - 70% затемнения)
             lp.dimAmount = 0.7f;
             window.setAttributes(lp);
-            // Включаем флаг затемнения
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
 
-        // Кнопка закрытия
         ImageButton closeButton = settingsDialog.findViewById(R.id.closeButton);
         closeButton.setOnClickListener(v -> settingsDialog.dismiss());
 
-        // Настройка SeekBar для громкости
         SeekBar volumeSeekBar = settingsDialog.findViewById(R.id.volumeSeekBar);
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
 
@@ -401,17 +496,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
-        // Получаем кнопку выхода
         ImageButton exitButton = settingsDialog.findViewById(R.id.exitButton);
-
-        // Обработчик клика для выхода из приложения
         exitButton.setOnClickListener(v -> {
-            // Закрываем диалог
             settingsDialog.dismiss();
-
-            // Полностью закрываем приложение
-            finishAffinity(); // Закрывает все Activity
-            System.exit(0);   // Завершает процесс
+            finishAffinity();
+            System.exit(0);
         });
 
         settingsDialog.show();
