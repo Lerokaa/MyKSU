@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="@drawable/dialog_background"
+    android:background="@drawable/dor_dialog_background_1"
     android:elevation="8dp">
 
     <TextView
@@ -34,7 +34,7 @@
         android:id="@+id/dialog_close"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:background="@drawable/button_background"
+        android:background="@drawable/btn_text_background_1"
         android:fontFamily="@font/nunito_black"
         android:text="Закрыть"
         android:textColor="#FFFFFF"

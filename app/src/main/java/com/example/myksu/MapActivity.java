@@ -2,11 +2,18 @@ package com.example.myksu;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -68,6 +75,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Toast.makeText(this, "Местоположение не получено", Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Add navigation button click handler
+        ImageButton navigationButton = findViewById(R.id.navigation_button);
+        navigationButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MapActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish(); // Optional: close current activity if you don't want to keep it in back stack
+        });
+
+        // Настройка кнопки настроек
+        ImageButton settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(v -> showSettingsDialog());
     }
 
     @Override
@@ -104,7 +123,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         );
 
         for (int i = 0; i < buildingLocations.size(); i++) {
-            int iconRes = (i == 0) ? R.drawable.marker : R.drawable.non_marker;
+            int iconRes = (i == 0) ? R.drawable.btn_icons_marker : R.drawable.btn_icons_non_marker;
 
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(buildingLocations.get(i))
@@ -139,7 +158,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(dormitoryLocations.get(i))
                     .title(dormitoryTitles.get(i))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two))
             );
             if (marker != null) {
                 dormitoryMarkers.put(marker, false);
@@ -216,14 +235,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             if (results[0] <= PROXIMITY_RADIUS) {
                 if (!entry.getValue()) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_selected));
                     buildingMarkers.put(marker, true);
                 }
             } else {
                 if (entry.getValue()) {
                     int iconRes = marker.getTitle().equals("Главный корпус")
-                            ? R.drawable.marker
-                            : R.drawable.non_marker;
+                            ? R.drawable.btn_icons_marker
+                            : R.drawable.btn_icons_non_marker;
                     marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
                     buildingMarkers.put(marker, false);
                 }
@@ -244,7 +263,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             currentSelectedMarker = null;
         } else {
             if (buildingMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
 
                 if (marker.getTitle().equals("ИПП корпус")) {
                     showBuildingDialog("Корпус недоступен",
@@ -255,7 +274,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
 
             } else if (dormitoryMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
                 // Больше не показываем всплывающие окна для общежитий
             }
 
@@ -271,13 +290,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         if (buildingMarkers.containsKey(marker)) {
             int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
-                    ? R.drawable.marker_selected
+                    ? R.drawable.btn_icons_marker_selected
                     : (marker.getTitle().equals("Главный корпус")
-                    ? R.drawable.marker
-                    : R.drawable.non_marker);
+                    ? R.drawable.btn_icons_marker
+                    : R.drawable.btn_icons_non_marker);
             marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
         } else if (dormitoryMarkers.containsKey(marker)) {
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two));
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two));
         }
     }
 
@@ -294,5 +313,76 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Toast.makeText(this, "Разрешение на местоположение отклонено", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void showSettingsDialog() {
+        Dialog settingsDialog = new Dialog(this);
+        settingsDialog.setContentView(R.layout.dialog_settings);
+
+        // Убираем стандартный заголовок и делаем прозрачный фон
+        settingsDialog.setTitle(null);
+        settingsDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Настраиваем размеры диалога и затемнение
+        Window window = settingsDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(window.getAttributes());
+            // Устанавливаем фиксированные размеры (315x210 dp)
+            lp.width = (int) (315 * getResources().getDisplayMetrics().density);
+            lp.height = (int) (210 * getResources().getDisplayMetrics().density);
+            // Устанавливаем уровень затемнения (0.7f - 70% затемнения)
+            lp.dimAmount = 0.7f;
+            window.setAttributes(lp);
+            // Включаем флаг затемнения
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        }
+
+        // Кнопка закрытия
+        ImageButton closeButton = settingsDialog.findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> settingsDialog.dismiss());
+
+        // Настройка SeekBar для громкости
+        SeekBar volumeSeekBar = settingsDialog.findViewById(R.id.volumeSeekBar);
+        AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+
+        int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        volumeSeekBar.setMax(maxVolume);
+        volumeSeekBar.setProgress(currentVolume);
+
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, progress, 0);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        // Получаем кнопку выхода
+        ImageButton exitButton = settingsDialog.findViewById(R.id.exitButton);
+
+        // Обработчик клика для выхода из приложения
+        View.OnClickListener exitListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Закрываем диалог
+                settingsDialog.dismiss();
+
+                // Полностью закрываем приложение
+                finishAffinity(); // Закрывает все Activity
+                System.exit(0);   // Завершает процесс
+            }
+        };
+
+        // Назначаем обработчик на кнопку
+        exitButton.setOnClickListener(exitListener);
+
+        settingsDialog.show();
     }
 }
