@@ -123,7 +123,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         );
 
         for (int i = 0; i < buildingLocations.size(); i++) {
-            int iconRes = (i == 0) ? R.drawable.marker : R.drawable.non_marker;
+            int iconRes = (i == 0) ? R.drawable.btn_icons_marker : R.drawable.btn_icons_non_marker;
 
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(buildingLocations.get(i))
@@ -158,7 +158,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             Marker marker = mMap.addMarker(new MarkerOptions()
                     .position(dormitoryLocations.get(i))
                     .title(dormitoryTitles.get(i))
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two))
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two))
             );
             if (marker != null) {
                 dormitoryMarkers.put(marker, false);
@@ -235,14 +235,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             if (results[0] <= PROXIMITY_RADIUS) {
                 if (!entry.getValue()) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_selected));
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_selected));
                     buildingMarkers.put(marker, true);
                 }
             } else {
                 if (entry.getValue()) {
                     int iconRes = marker.getTitle().equals("Главный корпус")
-                            ? R.drawable.marker
-                            : R.drawable.non_marker;
+                            ? R.drawable.btn_icons_marker
+                            : R.drawable.btn_icons_non_marker;
                     marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
                     buildingMarkers.put(marker, false);
                 }
@@ -263,7 +263,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             currentSelectedMarker = null;
         } else {
             if (buildingMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
 
                 if (marker.getTitle().equals("ИПП корпус")) {
                     showBuildingDialog("Корпус недоступен",
@@ -274,7 +274,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 }
 
             } else if (dormitoryMarkers.containsKey(marker)) {
-                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_clicked_two));
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
                 // Больше не показываем всплывающие окна для общежитий
             }
 
@@ -290,13 +290,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         if (buildingMarkers.containsKey(marker)) {
             int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
-                    ? R.drawable.marker_selected
+                    ? R.drawable.btn_icons_marker_selected
                     : (marker.getTitle().equals("Главный корпус")
-                    ? R.drawable.marker
-                    : R.drawable.non_marker);
+                    ? R.drawable.btn_icons_marker
+                    : R.drawable.btn_icons_non_marker);
             marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
         } else if (dormitoryMarkers.containsKey(marker)) {
-            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.marker_two));
+            marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two));
         }
     }
 

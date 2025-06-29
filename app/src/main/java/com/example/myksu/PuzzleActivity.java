@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -40,7 +39,7 @@ public class PuzzleActivity extends AppCompatActivity {
     private PuzzlePiecesAdapter piecesAdapter;
     private PuzzleBoardAdapter boardAdapter;
     private ImageView dragImageView;
-    private int emptyPieceResId = R.drawable.empty_piece_bg;
+    private int emptyPieceResId = R.drawable.other_empty_piece_bg;
     private ImageButton btnShuffle, btnHint, btnReset, btnHelp;
     private List<Integer> fixedPositions = new ArrayList<>();
     private int draggedFromPosition = -1;
@@ -60,7 +59,7 @@ public class PuzzleActivity extends AppCompatActivity {
         btnReset = findViewById(R.id.btnReset);
         btnHelp = findViewById(R.id.btnHelp);
 
-        originalImage = BitmapFactory.decodeResource(getResources(), R.drawable.puzzle_image);
+        originalImage = BitmapFactory.decodeResource(getResources(), R.drawable.minigames_puzzle_image);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
