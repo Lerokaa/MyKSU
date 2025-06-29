@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ksu_background"
+    android:background="@drawable/important_ksu_background"
     tools:context=".MainActivity">
 
     <!-- Горизонтальные Guidelines для позиционирования -->
@@ -30,20 +30,19 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Настройки"
-        android:src="@drawable/ic_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+        android:src="@drawable/btn_icons_settings"
+        android:contentDescription="Настройки" />
 
     <!-- Горизонтальная иконка по центру  -->
     <ImageView
         android:id="@+id/mainIcon"
+
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="32dp"
-        android:contentDescription="Логотип приложения"
         android:scaleType="fitCenter"
-        android:src="@drawable/ic_logo"
         app:layout_constraintBottom_toTopOf="@+id/blueLine"
         app:layout_constraintDimensionRatio="325:137"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,6 +50,10 @@
         app:layout_constraintTop_toTopOf="@+id/guideline_top"
         app:layout_constraintVertical_bias="0.3"
     app:layout_constraintWidth_percent="0.8" />
+
+        android:src="@drawable/icons_ksu_logo_big"
+        android:contentDescription="Логотип приложения" />
+
 
     <!-- Синяя линия с текстом -->
     <View
@@ -99,9 +102,10 @@
                 android:id="@+id/startButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:src="@drawable/btn_text_start"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Начать"
-                android:src="@drawable/ic_start" />
+                 />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -122,9 +126,11 @@
                 android:id="@+id/continueButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:src="@drawable/btn_text_start"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Продолжить"
-                android:src="@drawable/ic_start" />
+                />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -145,9 +151,10 @@
                 android:id="@+id/exitButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+
+                android:src="@drawable/btn_text_start"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Выход"
-                android:src="@drawable/ic_start" />
+                android:contentDescription="Выход" />
 
             <TextView
                 android:layout_width="wrap_content"

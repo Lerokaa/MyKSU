@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ksu_background"
+    android:background="@drawable/important_ksu_background"
     android:fillViewport="true">
 
     <RelativeLayout
@@ -22,7 +22,7 @@
             android:layout_alignParentTop="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Навигация"
-            android:src="@drawable/ic_navigation" />
+            android:src="@drawable/btn_icons_navigation" />
 
         <!-- Центральная иконка -->
         <ImageButton
@@ -33,7 +33,7 @@
             android:layout_centerHorizontal="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Центральная кнопка"
-            android:src="@drawable/ic_ksu_icon" />
+            android:src="@drawable/icons_ksu_logo_small" />
 
         <!-- Иконки в правом верхнем углу (столбец) -->
         <LinearLayout
@@ -49,7 +49,7 @@
                 android:id="@+id/btnShuffle"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:src="@drawable/ic_shuffle"
+                android:src="@drawable/btn_icons_settings"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Перемешать"
                 android:layout_marginBottom="8dp"/>
@@ -58,7 +58,7 @@
                 android:id="@+id/btnHint"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:src="@drawable/ic_hint"
+                android:src="@drawable/btn_icons_hint"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Подсказка"
                 android:layout_marginBottom="8dp"/>
@@ -67,7 +67,7 @@
                 android:id="@+id/btnReset"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:src="@drawable/ic_reset"
+                android:src="@drawable/btn_icons_return_to_map"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Сбросить"/>
         </LinearLayout>
@@ -104,7 +104,7 @@
                 android:numColumns="1"
                 android:verticalSpacing="8dp"
                 android:gravity="center"
-                android:background="@drawable/puzzle_board_bg"
+                android:background="@drawable/minigames_puzzle_board_bg"
                 android:padding="4dp"/>
 
             <!-- Поле для сборки (75% ширины) -->
@@ -113,7 +113,7 @@
                 android:layout_width="0dp"
                 android:layout_height="400dp"
                 android:layout_weight="3"
-                android:background="@drawable/puzzle_board_bg_second"
+                android:background="@drawable/minigames_puzzle_board_bg_second"
                 android:padding="8dp">
 
                 <GridView
@@ -138,6 +138,6 @@
             android:layout_centerHorizontal="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Help"
-            android:src="@drawable/ic_help" />
+            android:src="@drawable/btn_icons_help" />
     </RelativeLayout>
 </ScrollView>

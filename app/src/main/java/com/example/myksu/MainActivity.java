@@ -54,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
         if (window != null) {
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(window.getAttributes());
-            // Устанавливаем фиксированные размеры (315x186 dp)
+            // Устанавливаем фиксированные размеры (315x210 dp)
             lp.width = (int) (315 * getResources().getDisplayMetrics().density);
-            lp.height = (int) (186 * getResources().getDisplayMetrics().density);
+            lp.height = (int) (210 * getResources().getDisplayMetrics().density);
             // Устанавливаем уровень затемнения (0.7f - 70% затемнения)
             lp.dimAmount = 0.7f;
             window.setAttributes(lp);
@@ -89,6 +89,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+
+        // Получаем кнопку выхода
+        ImageButton exitButton = settingsDialog.findViewById(R.id.exitButton);
+
+        // Обработчик клика для выхода из приложения
+        View.OnClickListener exitListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Закрываем диалог
+                settingsDialog.dismiss();
+
+                // Полностью закрываем приложение
+                finishAffinity(); // Закрывает все Activity
+                System.exit(0);   // Завершает процесс
+            }
+        };
+
+        // Назначаем обработчик на кнопку
+        exitButton.setOnClickListener(exitListener);
 
         settingsDialog.show();
     }
