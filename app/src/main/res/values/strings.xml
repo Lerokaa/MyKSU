@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MyKSU</string>
+    <string name="details">Подробнее</string>
+    <string name="route">Маршрут</string>
 </resources>
