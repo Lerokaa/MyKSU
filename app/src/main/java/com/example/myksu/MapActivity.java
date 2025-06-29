@@ -243,46 +243,50 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         String origin = currentUserLocation.latitude + "," + currentUserLocation.longitude;
         String destination = destinationMarker.getPosition().latitude + "," + destinationMarker.getPosition().longitude;
-        String url = DIRECTIONS_URL + "origin=" + origin + "&destination=" + destination +
+
+        String url = DIRECTIONS_URL + "origin=" + origin +
+                "&destination=" + destination +
                 "&mode=walking&key=" + DIRECTIONS_API_KEY;
+
+        Log.d("RouteRequest", "Request URL: " + url);
 
         Request request = new Request.Builder().url(url).build();
         httpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                runOnUiThread(() ->
-                        Toast.makeText(MapActivity.this, "Ошибка при подключении к серверу маршрута", Toast.LENGTH_SHORT).show()
-                );
-                Log.e("RouteError", "Failed to fetch route", e);
+                runOnUiThread(() -> {
+                    Toast.makeText(MapActivity.this, "Ошибка подключения: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.e("RouteError", "Connection failed", e);
+                });
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    runOnUiThread(() ->
-                            Toast.makeText(MapActivity.this, "Сервер вернул ошибку маршрута", Toast.LENGTH_SHORT).show()
-                    );
-                    Log.e("RouteError", "Unsuccessful response: " + response.code());
-                    return;
-                }
-
                 try {
-                    String responseData = response.body() != null ? response.body().string() : "";
-                    JSONObject json = new JSONObject(responseData);
+                    if (!response.isSuccessful()) {
+                        throw new IOException("Unexpected code " + response);
+                    }
 
-                    if (!json.has("routes") || json.getJSONArray("routes").length() == 0) {
-                        runOnUiThread(() ->
-                                Toast.makeText(MapActivity.this, "Маршрут не найден", Toast.LENGTH_SHORT).show()
-                        );
-                        Log.w("RouteError", "No routes found in response");
+                    String responseData = response.body().string();
+                    Log.d("RouteResponse", responseData);
+
+                    JSONObject json = new JSONObject(responseData);
+                    String status = json.getString("status");
+
+                    if (!"OK".equals(status)) {
+                        String errorMessage = json.optString("error_message", "Неизвестная ошибка маршрутизации");
+                        runOnUiThread(() -> {
+                            Toast.makeText(MapActivity.this, "Ошибка маршрутизации: " + errorMessage, Toast.LENGTH_LONG).show();
+                            Log.e("RouteError", "API Error: " + status + " - " + errorMessage);
+                        });
                         return;
                     }
 
+                    // Обработка успешного ответа
                     String points = json.getJSONArray("routes")
                             .getJSONObject(0)
                             .getJSONObject("overview_polyline")
                             .getString("points");
-
                     List<LatLng> path = PolyUtil.decode(points);
 
                     runOnUiThread(() -> {
@@ -296,15 +300,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationMarker.getPosition(), 15));
                     });
                 } catch (Exception e) {
-                    runOnUiThread(() ->
-                            Toast.makeText(MapActivity.this, "Ошибка обработки маршрута", Toast.LENGTH_SHORT).show()
-                    );
-                    Log.e("RouteError", "Exception parsing route", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(MapActivity.this, "Ошибка обработки маршрута: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                        Log.e("RouteError", "Processing error", e);
+                    });
+                } finally {
+                    if (response.body() != null) {
+                        response.body().close();
+                    }
                 }
             }
         });
     }
-
 
     @Override
     public boolean onMarkerClick(@NonNull Marker marker) {
