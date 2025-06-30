@@ -1,11 +1,9 @@
 package com.example.myksu;
 
 import android.app.Dialog;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -16,7 +14,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SecondCharactersDialog extends AppCompatActivity {
+public class InformationAboutKorpus extends AppCompatActivity {
 
     private ViewPager2 photosCarousel;
     private CarouselAdapter carouselAdapter;
@@ -27,7 +25,7 @@ public class SecondCharactersDialog extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.second_charaters_dialog);
+        setContentView(R.layout.information_about_korpus);
 
         initUI();
         setupTextContent();

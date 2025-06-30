@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/important_ksu_background"
-    tools:context=".SecondCharactersDialog">
+    tools:context=".InformationAboutKorpus">
 
     <!-- Верхняя панель с кнопками и логотипом (такая же как в оригинале) -->
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -213,7 +213,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@null"
-                    android:contentDescription="@string/start"
                     android:scaleType="centerInside"
                     android:src="@drawable/btn_icons_route" />
 
@@ -240,7 +239,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="52dp"
                     android:background="@null"
-                    android:contentDescription="@string/cont"
                     android:scaleType="centerInside"
                     android:src="@drawable/btn_icons_route" />
 
