@@ -34,6 +34,8 @@
         </activity>
         <activity android:name=".PuzzleActivity" />
         <activity android:name=".CharactersDialogActivity" android:exported="true"/>
+        <activity android:name=".InformationAboutKorpus" android:exported="true"/>
+        <activity android:name=".InformationAboutObshagi" android:exported="true"/>
     </application>
 
 </manifest>
