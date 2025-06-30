@@ -100,7 +100,6 @@
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-
             <ImageButton
                 android:id="@+id/startButton"
                 android:layout_width="wrap_content"
@@ -108,7 +107,7 @@
                 android:src="@drawable/btn_text_start"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Начать"
-                 />
+                />
 
             <TextView
                 android:layout_width="wrap_content"

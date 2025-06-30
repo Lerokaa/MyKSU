@@ -2,4 +2,7 @@
     <string name="app_name">MyKSU</string>
     <string name="details">Подробнее</string>
     <string name="route">Маршрут</string>
+    <string name="commandant_format">Комендант: %s</string>
+    <string name="phone_format">Телефон: %s</string>
+    <string name="institutes_format">Институты: %s</string>
 </resources>
