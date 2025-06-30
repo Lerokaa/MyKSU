@@ -2,4 +2,6 @@
     <string name="app_name">MyKSU</string>
     <string name="details">Подробнее</string>
     <string name="route">Маршрут</string>
+    <string name="start">Начать</string>
+    <string name="cont">Продолжить</string>
 </resources>
