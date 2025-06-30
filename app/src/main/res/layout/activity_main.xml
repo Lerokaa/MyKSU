@@ -25,14 +25,17 @@
     <!-- Иконка настроек в правом верхнем углу -->
     <ImageButton
         android:id="@+id/settingsButton"
-        android:layout_width="59dp"
-        android:layout_height="59dp"
-        android:layout_marginTop="16dp"
+        android:layout_width="44dp"
+        android:layout_height="45dp"
+        android:layout_gravity="top|end"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:padding="0dp"
         android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/btn_icons_settings"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:src="@drawable/btn_icons_settings"
+        android:scaleType="fitCenter"
         android:contentDescription="Настройки" />
 
     <!-- Горизонтальная иконка по центру  -->
