@@ -2,9 +2,15 @@ package com.example.myksu;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.StyleSpan;
+import android.text.style.TypefaceSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -14,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
 import java.io.InputStream;
@@ -197,13 +204,63 @@ public class CharactersDialogActivity extends AppCompatActivity {
         characterText.setOnClickListener(v -> showNextPhrase());
     }
 
+    private CharSequence formatTextWithBold(String text) {
+        SpannableStringBuilder builder = new SpannableStringBuilder(text);
+        Typeface boldTypeface = ResourcesCompat.getFont(this, R.font.nunito_black);
+        float increasedSize = 20;
+
+        int startPos = -1;
+        while ((startPos = builder.toString().indexOf('*', startPos + 1)) != -1) {
+            int endPos = builder.toString().indexOf('*', startPos + 1);
+            if (endPos == -1) break;
+
+            // Удаляем звёздочки
+            builder.delete(endPos, endPos + 1);
+            builder.delete(startPos, startPos + 1);
+            endPos -= 1; // Корректируем позицию
+
+            // Применяем жирный шрифт
+            builder.setSpan(
+                    new StyleSpan(Typeface.BOLD), // Стандартный StyleSpan
+                    startPos,
+                    endPos,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+
+            // Принудительно устанавливаем nunito_b
+            if (boldTypeface != null) {
+                builder.setSpan(
+                        new TypefaceSpan(boldTypeface),
+                        startPos,
+                        endPos,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+            }
+
+            builder.setSpan(
+                    new AbsoluteSizeSpan((int) increasedSize, true),
+                    startPos,
+                    endPos,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            );
+
+            startPos = endPos;
+        }
+
+        return builder;
+    }
+
     private void updatePhraseDisplay() {
         if (phrases == null || currentPhraseIndex >= phrases.size()) return;
 
-        String currentPhrase = phrases.get(currentPhraseIndex);
-        characterText.setText(currentPhrase);
+        String originalText = phrases.get(currentPhraseIndex);
+        CharSequence formattedText = formatTextWithBold(originalText);
 
-        // Анимация смены текста
+        characterText.setText(formattedText);
+        Log.d("TEXT_FORMAT", "Original: " + originalText);
+        Log.d("TEXT_FORMAT", "Formatted: " + formattedText);
+
+        // Анимация
         characterText.setAlpha(0.1f);
         characterText.animate()
                 .alpha(1f)
@@ -216,13 +273,35 @@ public class CharactersDialogActivity extends AppCompatActivity {
 
         currentPhraseIndex++;
 
+        // Меняем изображение после второй фразы (индекс 1, так как индексация с 0)
+        if (currentPhraseIndex == 2 && currentDialog.getPic().size() > 1) {
+            updateCharacterImage(1); // Берем второе изображение
+        }
+
         if (currentPhraseIndex >= phrases.size()) {
-            // Диалог завершен
             handleDialogComplete();
             return;
         }
 
         updatePhraseDisplay();
+    }
+
+    private void updateCharacterImage(int imageIndex) {
+        ImageView characterImage = findViewById(R.id.characterImage);
+        try {
+            String imageName = currentDialog.getPic().get(imageIndex);
+            String resourceName = imageName.replace(".png", "").replace(".jpg", "").replace(".webp", "");
+            int resId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
+
+            if (resId != 0) {
+                // Простая смена изображения без анимации
+                characterImage.setImageResource(resId);
+            } else {
+                Log.e("IMAGE_CHANGE", "Image not found: " + resourceName);
+            }
+        } catch (Exception e) {
+            Log.e("IMAGE_CHANGE", "Error changing character image", e);
+        }
     }
 
     private void handleDialogComplete() {
