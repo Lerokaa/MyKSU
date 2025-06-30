@@ -3,6 +3,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,12 +11,35 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import java.io.InputStream;
+
 public class CustomDialogObshaga extends DialogFragment {
+
+    private static final String ARG_DORMITORY_ID = "dormitory_id";
+    private int dormitoryId;
+
+    // Создаем новый экземпляр с передачей ID
+    public static CustomDialogObshaga newInstance(int dormitoryId) {
+        CustomDialogObshaga fragment = new CustomDialogObshaga();
+        Bundle args = new Bundle();
+        args.putInt(ARG_DORMITORY_ID, dormitoryId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            dormitoryId = getArguments().getInt(ARG_DORMITORY_ID);
+        }
+    }
 
     @Nullable
     @Override
@@ -27,38 +51,75 @@ public class CustomDialogObshaga extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Настройка изображения
-        ImageView imageView = view.findViewById(R.id.imageView);
-        imageView.setImageResource(R.drawable.other_placeholder_image);
+        // Загружаем данные об общежитии
+        try {
+            InputStream inputStream = getResources().openRawResource(R.raw.dormitories);
+            DormitoryData.Dormitory dorm = DormitoryData.parseSingleDormitory(inputStream, dormitoryId);
 
-        // Настройка заголовков
-        TextView titleText = view.findViewById(R.id.name);
-        titleText.setText("Общага №1");
+            if (dorm != null) {
+                // Настройка изображения
+                ImageView imageView = view.findViewById(R.id.imageView);
+                if (dorm.getPhotos() != null && !dorm.getPhotos().isEmpty()) {
+                    String photoName = dorm.getPhotos().get(0).replace(".jpg", ""); // Удаляем расширение
+                    int resId = getResources().getIdentifier(
+                            photoName,
+                            "drawable",
+                            requireContext().getPackageName()
+                    );
 
-        TextView subtitleText = view.findViewById(R.id.address);
-        subtitleText.setText("(1 переулок Воскресенский, 17)");
+                    if (resId != 0) {
+                        imageView.setImageResource(resId); // Загружаем напрямую
+                    } else {
+                        imageView.setImageResource(R.drawable.other_placeholder_image); // Заглушка
+                        Log.e("ImageLoad", "Изображение не найдено: " + photoName);
+                    }
+                } else {
+                    imageView.setImageResource(R.drawable.other_placeholder_image);
+                }
 
-        // Добавленные поля
-        TextView commendantText = view.findViewById(R.id.commandant);
-        commendantText.setText("Комендант: Иванова И.И.");
+                // Заполняем текстовые поля
+                TextView Name = view.findViewById(R.id.name);
+                Name.setText(dorm.getName());
 
-        TextView phoneText = view.findViewById(R.id.phone);
-        phoneText.setText("Телефон: +7 (123) 456-78-90");
+                TextView Address = view.findViewById(R.id.address);
+                Address.setText(dorm.getAddress());
 
-        TextView instituteText = view.findViewById(R.id.institute);
-        instituteText.setText("Институт: ИИТиТО");
+                TextView commendantText = view.findViewById(R.id.commandant);
+                commendantText.setText(getString(R.string.commandant_format, dorm.getCommandant()));
 
-        // Настройка кнопок (без изменений)
-        ImageButton detailsButton = view.findViewById(R.id.detailsButton);
-        detailsButton.setOnClickListener(v -> {
-            // Обработка нажатия "Подробнее"
-        });
+                TextView phoneText = view.findViewById(R.id.phone);
+                phoneText.setText(getString(R.string.phone_format, dorm.getPhone()));
 
-        ImageButton routeButton = view.findViewById(R.id.routeButton);
-        routeButton.setOnClickListener(v -> {
-            // Обработка нажатия "Маршрут"
-        });
+                TextView instituteText = view.findViewById(R.id.institute);
+                if (dorm.getInstitutes() != null && !dorm.getInstitutes().isEmpty()) {
+                    instituteText.setText(getString(R.string.institutes_format,
+                            String.join(", ", dorm.getInstitutes())));
+                } else {
+                    instituteText.setVisibility(View.GONE);
+                }
+
+                // Настройка кнопок
+                ImageButton detailsButton = view.findViewById(R.id.detailsButton);
+                detailsButton.setOnClickListener(v -> {
+                    // Обработка нажатия "Подробнее"
+
+                });
+
+                ImageButton routeButton = view.findViewById(R.id.routeButton);
+                routeButton.setOnClickListener(v -> {
+                    // Обработка нажатия "Маршрут"
+
+                });
+            } else {
+                Toast.makeText(getContext(), "Данные об общежитии не найдены", Toast.LENGTH_SHORT).show();
+                dismiss();
+            }
+        } catch (Exception e) {
+            Toast.makeText(getContext(), "Ошибка загрузки данных", Toast.LENGTH_SHORT).show();
+            dismiss();
+        }
     }
+
 
     @Override
     public void onStart() {
