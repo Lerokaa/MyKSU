@@ -85,6 +85,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
+        // Настройка кнопки "Назад"
+        ImageButton backButton = findViewById(R.id.navigation_button);
+        backButton.setOnClickListener(v -> finish()); // Закрывает текущую Activity и возвращает на предыдущую
+
         // Инициализация карты
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.map);
@@ -103,14 +107,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 Toast.makeText(this, "Местоположение не получено", Toast.LENGTH_SHORT).show();
                 requestLastKnownLocation();
             }
-        });
-
-        // Кнопка навигации (возврат в главное меню)
-        ImageButton navigationButton = findViewById(R.id.navigation_button);
-        navigationButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MapActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
         });
 
         // Кнопка настроек
