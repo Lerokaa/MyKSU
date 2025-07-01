@@ -86,10 +86,19 @@ public class CharactersDialogActivity extends AppCompatActivity {
 
         // Настройка кнопки достижений
         ImageButton continueButton = findViewById(R.id.achievementsButton);
-        continueButton.setOnClickListener(v -> {
-            Intent intent = new Intent(CharactersDialogActivity.this, AchievementActivity.class);
-            startActivity(intent);
-        });
+        if (continueButton == null) {
+            Log.e("TEST", "Button not found! Check ID or layout.");
+        } else {
+            continueButton.setOnClickListener(v -> {
+                Log.d("TEST", "Button clicked!"); // Проверка, что клик срабатывает
+                try {
+                    Intent intent = new Intent(this, AchievementActivity.class);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    Log.e("TEST", "Error starting activity", e);
+                }
+            });
+        }
 
         // Загружаем данные с подробным логированием
         try {
@@ -108,7 +117,6 @@ public class CharactersDialogActivity extends AppCompatActivity {
             initUI();
             setupUIComponents();
             setupCarousel();
-            setupButtonListeners();
 
         } catch (Exception e) {
             Log.e("DATA_LOAD", "Критическая ошибка загрузки", e);
@@ -453,28 +461,6 @@ public class CharactersDialogActivity extends AppCompatActivity {
         });
     }
 
-    private void setupButtonListeners() {
-        ImageButton backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(CharactersDialogActivity.this, MapActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Настройка кнопки настроек
-        ImageButton settingsButton = findViewById(R.id.settingsButton);
-        settingsButton.setOnClickListener(v -> showSettingsDialog());
-
-        ImageButton achievementsButton = findViewById(R.id.achievementsButton);
-        achievementsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Обработчик кнопки "Достижения"
-            }
-        });
-    }
 
     @Override
     protected void onResume() {
