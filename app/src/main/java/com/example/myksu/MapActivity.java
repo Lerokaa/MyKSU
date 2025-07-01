@@ -413,8 +413,25 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             if (isCurrentlySelected) {
                 resetMarkerIcon(marker);
                 currentSelectedMarker = null;
-            } else {
-                if (buildingMarkers.containsKey(marker)) {
+                return true;
+            }
+
+            // Обновляем текущий выбранный маркер
+            currentSelectedMarker = marker;
+
+            if (buildingMarkers.containsKey(marker)) {
+                // Проверяем, является ли маркер активным (selected)
+                boolean isSelectedMarker = Boolean.TRUE.equals(buildingMarkers.get(marker));
+
+                if (isSelectedMarker) {
+                    // Для активного маркера сразу показываем карточку корпуса
+                    int buildingNumber = getBuildingNumber(marker.getTitle());
+                    Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
+                    intent.putExtra("DIALOG_ID", buildingNumber);
+                    startActivity(intent);
+                    Log.d("MapActivity", "Building number: " + buildingNumber);
+                } else {
+                    // Для неактивного маркера показываем всплывающее окно
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
 
                     String buildingName = marker.getTitle();
@@ -430,12 +447,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     }
 
                     showCustomDialog("Корпус недоступен", message, showRouteButton, marker);
-                } else if (dormitoryMarkers.containsKey(marker)) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
-                    showCustomDialog(marker.getTitle(), "Общежитие", false, marker);
                 }
-
-                currentSelectedMarker = marker;
+            } else if (dormitoryMarkers.containsKey(marker)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
+                // Получаем номер из названия ("Общежитие №X")
+                String title = marker.getTitle();
+                int selectedDormitoryId = Integer.parseInt(title.replaceAll("[^0-9]", ""));
+                CustomDialogObshaga dialog = CustomDialogObshaga.newInstance(selectedDormitoryId);
+                dialog.show(getSupportFragmentManager(), "dormitory_dialog");
             }
 
             marker.showInfoWindow();
@@ -443,6 +462,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         } catch (Exception e) {
             Log.e("MapActivity", "Error in onMarkerClick: " + e.getMessage());
             return false;
+        }
+    }
+
+    // Вспомогательный метод для определения номера корпуса
+    private int getBuildingNumber(String buildingTitle) {
+        switch (buildingTitle) {
+            case "Главный корпус": return 1;
+            case "Е корпус": return 9;
+            case "Б корпус": return 3;
+            case "В корпус":
+            case "Д корпус": return 5;
+            case "А1 корпус": return 2;
+            case "Г1 корпус": return 7;
+            case "В1 корпус": return 6;
+            case "Б1 корпус": return 4;
+            case "Спортивный корпус": return 10;
+            case "ИПП корпус": return 11;
+            default: return -1; // Неизвестный корпус
         }
     }
 
