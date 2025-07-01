@@ -32,6 +32,8 @@ public class InformationAboutKorpus extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.information_about_korpus);
 
+        Log.e("BuildingData", "Error loading building data");
+
         // Получаем ID корпуса из Intent
         int buildingId = getIntent().getIntExtra("BUILDING_ID", 1); // 1 - значение по умолчанию
 
@@ -155,17 +157,27 @@ public class InformationAboutKorpus extends AppCompatActivity {
         }
 
         // Настройка кнопки достижений
-        ImageButton continueButton = findViewById(R.id.btnHint);
+        ImageButton continueButton = findViewById(R.id.achievementsButton);
         continueButton.setOnClickListener(v -> {
-            Intent intent = new Intent(InformationAboutKorpus.this, AchievementActivity.class);
+            Intent intent = new Intent(this, AchievementActivity.class);
             startActivity(intent);
         });
 
         ImageButton startButton = findViewById(R.id.startButton);
         if (startButton != null) {
             startButton.setOnClickListener(v -> {
-                // Действие при нажатии "Начать"
+                Intent intent = new Intent(this, MapActivity.class);
+                startActivity(intent);
             });
+        }
+        ImageButton gameButton = findViewById(R.id.btn_continue);
+        if (gameButton != null) {
+            if (building.getId() == 1){
+            gameButton.setOnClickListener(v -> {
+                Intent intent = new Intent(this, GuessNumberActivity.class);
+                startActivity(intent);
+            });
+            }
         }
     }
 

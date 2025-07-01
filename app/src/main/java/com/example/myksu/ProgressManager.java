@@ -75,10 +75,12 @@ public class ProgressManager {
         return statuses;
     }
 
-    public void completeBuilding(int buildingId) {
-        flagsManager.setBuildingDialogCompleted(buildingId);
+    public void completeGameBuilding(int buildingId) {
         flagsManager.setBuildingMiniGameCompleted(buildingId);
-        checkForAchievements(buildingId);
+    }
+
+    public boolean isGameBuilding(int buildingId) {
+        return flagsManager.isBuildingMiniGameCompleted(buildingId);
     }
 
     public boolean isWasBuildingDialog(int buildingId) {
@@ -93,11 +95,6 @@ public class ProgressManager {
         flagsManager.setDormitoryInfoViewed(dormitoryId);
     }
 
-    private void checkForAchievements(int buildingId) {
-        if (isBuildingFullyCompleted(buildingId)) {
-            // Логика выдачи достижения
-        }
-    }
 
     // ===== Работа с сохранениями =====
     public void saveProgress(Context context) {

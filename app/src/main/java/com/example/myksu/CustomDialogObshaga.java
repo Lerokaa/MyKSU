@@ -81,6 +81,8 @@ public class CustomDialogObshaga extends DialogFragment {
                 }
 
                 progressManager.isDormitoryInfoViewed(dorm.getId());
+                progressManager.saveProgress(requireContext());
+                Log.e("AchievementActivity", "obh");
                 // Заполняем текстовые поля
                 TextView Name = view.findViewById(R.id.name);
                 Name.setText(dorm.getName());
