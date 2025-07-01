@@ -33,7 +33,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PuzzleActivity" />
+        <activity android:name=".PuzzleActivity" android:exported="true" />
         <activity android:name=".CharactersDialogActivity" android:exported="true"/>
         <activity android:name=".InformationAboutKorpus" android:exported="true"/>
         <activity android:name=".InformationAboutObshagi" android:exported="true"/>

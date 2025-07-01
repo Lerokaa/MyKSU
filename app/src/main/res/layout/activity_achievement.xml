@@ -19,8 +19,8 @@
                 <!-- Back button -->
                 <ImageButton
                     android:id="@+id/backButton"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="59dp"
+                    android:layout_height="59dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/btn_icons_navigation"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -54,8 +54,8 @@
 
                     <ImageButton
                         android:id="@+id/settingsButton"
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="59dp"
+                        android:layout_height="59dp"
                         android:scaleType="fitCenter"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:src="@drawable/btn_icons_settings" />
