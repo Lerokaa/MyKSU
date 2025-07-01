@@ -86,10 +86,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
+            android:fontFamily="@font/nunito_black"
             android:text="Выход"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
-            android:fontFamily="@font/nunito_black"/>
+            android:textSize="18sp" />
     </RelativeLayout>
 
 </RelativeLayout>

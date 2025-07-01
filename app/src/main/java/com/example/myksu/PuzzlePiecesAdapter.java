@@ -14,12 +14,14 @@ public class PuzzlePiecesAdapter extends BaseAdapter {
     private List<Bitmap> pieces;
     private int pieceSize;
     private int emptyPieceResId;
+    private int horizontalSpacing = 4; // spacing between pieces in dp
 
     public PuzzlePiecesAdapter(Context context, List<Bitmap> pieces, int pieceSize, int emptyPieceResId) {
         this.context = context;
         this.pieces = new ArrayList<>(pieces);
         this.pieceSize = pieceSize;
         this.emptyPieceResId = emptyPieceResId;
+        this.horizontalSpacing = (int) (4 * context.getResources().getDisplayMetrics().density);
     }
 
     @Override
@@ -39,10 +41,25 @@ public class PuzzlePiecesAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = (convertView == null) ? new ImageView(context) : (ImageView) convertView;
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(pieceSize, pieceSize));
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageBitmap(pieces.get(position));
+        ImageView imageView;
+        if (convertView == null) {
+            imageView = new ImageView(context);
+            imageView.setLayoutParams(new ViewGroup.LayoutParams(
+                    pieceSize,
+                    pieceSize));
+            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imageView.setAdjustViewBounds(true);
+            imageView.setPadding(horizontalSpacing, 0, horizontalSpacing, 0);
+        } else {
+            imageView = (ImageView) convertView;
+        }
+
+        if (position < pieces.size() && pieces.get(position) != null) {
+            imageView.setImageBitmap(pieces.get(position));
+        } else {
+            imageView.setImageResource(emptyPieceResId);
+        }
+
         return imageView;
     }
 
@@ -68,7 +85,16 @@ public class PuzzlePiecesAdapter extends BaseAdapter {
     }
 
     public void highlightPiece(int position) {
-        ImageView view = (ImageView) getView(position, null, null);
-        view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
+        if (position >= 0 && position < pieces.size()) {
+            ImageView view = (ImageView) getView(position, null, null);
+            view.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_light));
+            notifyDataSetChanged();
+        }
+    }
+
+    // Update piece size dynamically when container size changes
+    public void updatePieceSize(int newSize) {
+        this.pieceSize = newSize;
+        notifyDataSetChanged();
     }
 }

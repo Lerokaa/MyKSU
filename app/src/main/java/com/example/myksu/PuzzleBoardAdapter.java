@@ -19,6 +19,7 @@ public class PuzzleBoardAdapter extends BaseAdapter {
     private List<Bitmap> originalPieces;
     private Bitmap[] boardPieces;
     private boolean[] fixedPieces;
+    private GridView gridView;
 
     public PuzzleBoardAdapter(Context context, int count, GridView gridView,
                               int columns, int pieceSize, int emptyPieceResId,
@@ -31,6 +32,16 @@ public class PuzzleBoardAdapter extends BaseAdapter {
         this.originalPieces = originalPieces;
         this.boardPieces = new Bitmap[count];
         this.fixedPieces = new boolean[count];
+        this.gridView = gridView;
+
+        // Рассчитываем размер элемента на основе размера GridView
+        gridView.post(() -> {
+            int width = gridView.getWidth();
+            if (width > 0) {
+                this.pieceSize = width / columns;
+                notifyDataSetChanged();
+            }
+        });
     }
 
     public void setFixedPiece(int position, Bitmap piece) {
@@ -56,9 +67,17 @@ public class PuzzleBoardAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView = (convertView == null) ? new ImageView(context) : (ImageView) convertView;
-        imageView.setLayoutParams(new ViewGroup.LayoutParams(pieceSize, pieceSize));
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        ImageView imageView;
+        if (convertView == null) {
+            imageView = new ImageView(context);
+            imageView.setLayoutParams(new GridView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imageView.setAdjustViewBounds(true);
+        } else {
+            imageView = (ImageView) convertView;
+        }
 
         if (boardPieces[position] != null) {
             imageView.setImageBitmap(boardPieces[position]);

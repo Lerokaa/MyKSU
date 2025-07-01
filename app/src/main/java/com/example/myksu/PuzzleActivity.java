@@ -14,6 +14,7 @@ import android.view.DragEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -50,25 +51,49 @@ public class PuzzleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.puzzle_main);
 
+        initializeViews();
+        setupImageResources();
+        initializePuzzle();
+        setupButtonListeners();
+    }
+
+    private void initializeViews() {
         puzzleGrid = findViewById(R.id.puzzleGrid);
         piecesGrid = findViewById(R.id.piecesGrid);
-
-        ImageButton navButton = findViewById(R.id.navButton);
         btnShuffle = findViewById(R.id.btnShuffle);
         btnHint = findViewById(R.id.btnHint);
         btnReset = findViewById(R.id.btnReset);
         btnHelp = findViewById(R.id.btnHelp);
+    }
 
+    private void setupImageResources() {
         originalImage = BitmapFactory.decodeResource(getResources(), R.drawable.minigames_puzzle_image);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        smallPieceSize = metrics.widthPixels / 6;
-        largePieceSize = (int) (metrics.widthPixels * 0.6) / puzzleCols;
 
-        initializePuzzle();
+        // Рассчитываем размеры динамически
+        int screenWidth = metrics.widthPixels - (2 * 12); // минус padding из XML
+        smallPieceSize = screenWidth / 6; // Размер для кусочков в нижней панели
+        largePieceSize = screenWidth / puzzleCols; // Размер для кусочков на игровом поле
 
-        navButton.setOnClickListener(v -> finish());
+        // Устанавливаем высоту игрового поля
+        FrameLayout puzzleBoard = findViewById(R.id.puzzleBoard);
+        puzzleBoard.post(() -> {
+            int availableHeight = metrics.heightPixels
+                    - puzzleBoard.getTop()
+                    - findViewById(R.id.piecesContainer).getHeight()
+                    - findViewById(R.id.btnHelp).getHeight()
+                    - (3 * 16); // минус margins
+
+            ViewGroup.LayoutParams params = puzzleBoard.getLayoutParams();
+            params.height = availableHeight;
+            puzzleBoard.setLayoutParams(params);
+        });
+    }
+
+    private void setupButtonListeners() {
+        findViewById(R.id.navButton).setOnClickListener(v -> finish());
         btnShuffle.setOnClickListener(v -> shufflePuzzle());
         btnHint.setOnClickListener(v -> showHint());
         btnReset.setOnClickListener(v -> resetPuzzle());
@@ -76,19 +101,31 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void showHelpDialog() {
+        // Create dialog
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.help_dialog);
         dialog.setCancelable(true);
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
+        // Make dialog background transparent
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Initialize views
         TextView title = dialog.findViewById(R.id.dialog_title);
         TextView message = dialog.findViewById(R.id.dialog_message);
         Button closeButton = dialog.findViewById(R.id.dialog_close);
 
-        title.setText("Помощь в игре");
-        message.setText("Как играть:\n\n1. Перетаскивайте кусочки пазла с левой панели на игровое поле\n2. Можно перетаскивать пазлы между позициями на поле\n3. Фиксированные пазлы нельзя перемещать");
+        // Set dialog content
+        title.setText("Game Help");
+        message.setText("How to play:\n\n1. Drag puzzle pieces from the bottom panel to the game board\n" +
+                "2. You can move pieces between positions on the board\n" +
+                "3. Fixed pieces cannot be moved");
 
+        // Set close button action
         closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        // Show dialog
         dialog.show();
     }
 
@@ -96,31 +133,34 @@ public class PuzzleActivity extends AppCompatActivity {
         puzzlePieces = splitImage(originalImage);
         originalPieces = new ArrayList<>(puzzlePieces);
 
-        // Выбираем 3 случайных позиции для фиксированных пазлов
+        selectFixedPieces();
+        createArrowIndicator();
+        setupAdapters();
+        setupDragAndDrop();
+    }
+
+    private void selectFixedPieces() {
         Random random = new Random();
         while (fixedPositions.size() < 3) {
             int pos = random.nextInt(puzzleRows * puzzleCols);
             if (!fixedPositions.contains(pos)) {
                 fixedPositions.add(pos);
+                puzzlePieces.remove(originalPieces.get(pos));
             }
         }
+    }
 
-        // Удаляем фиксированные пазлы из левой колонки
-        for (int pos : fixedPositions) {
-            puzzlePieces.remove(originalPieces.get(pos));
-        }
-
-        // Создаем синий квадрат со стрелкой и ставим его первым элементом
+    private void createArrowIndicator() {
         Bitmap arrowBitmap = createArrowBitmap(smallPieceSize);
         puzzlePieces.add(0, arrowBitmap);
-
         Collections.shuffle(puzzlePieces.subList(1, puzzlePieces.size()));
+    }
 
+    private void setupAdapters() {
         boardAdapter = new PuzzleBoardAdapter(
                 this, puzzleRows * puzzleCols, puzzleGrid, puzzleCols,
                 largePieceSize, emptyPieceResId, originalPieces);
 
-        // Устанавливаем фиксированные пазлы на их правильные позиции
         for (int pos : fixedPositions) {
             boardAdapter.setFixedPiece(pos, originalPieces.get(pos));
         }
@@ -130,8 +170,6 @@ public class PuzzleActivity extends AppCompatActivity {
 
         puzzleGrid.setAdapter(boardAdapter);
         piecesGrid.setAdapter(piecesAdapter);
-
-        setupDragAndDrop();
     }
 
     private Bitmap createArrowBitmap(int size) {
@@ -171,105 +209,121 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void setupDragAndDrop() {
-        piecesGrid.setOnItemLongClickListener((parent, view, position, id) -> {
-            if (position == 0) return false; // Не перетаскиваем синий квадрат
+        piecesGrid.setOnItemLongClickListener((parent, view, position, id) ->
+                startDragFromPieces(position, view));
 
-            Bitmap piece = piecesAdapter.getItem(position);
-            if (piece == null) return false;
+        puzzleGrid.setOnItemLongClickListener((parent, view, position, id) ->
+                startDragFromBoard(position, view));
 
-            currentDraggedBitmap = piece;
-            draggedFromPosition = position;
-            draggedFromBoard = false;
-            dragImageView = createDragImageView(piece);
-            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view) {
-                @Override
-                public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
-                    outShadowSize.set(view.getWidth(), view.getHeight());
-                    outShadowTouchPoint.set(view.getWidth() / 2, view.getHeight() / 2);
-                }
-            };
-            view.startDragAndDrop(null, shadowBuilder, position, 0);
-            return true;
-        });
-
-        puzzleGrid.setOnItemLongClickListener((parent, view, position, id) -> {
-            if (boardAdapter.isPositionFixed(position)) return false;
-
-            Bitmap piece = boardAdapter.getItem(position);
-            if (piece == null) return false;
-
-            currentDraggedBitmap = piece;
-            draggedFromPosition = position;
-            draggedFromBoard = true;
-            dragImageView = createDragImageView(piece);
-            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view) {
-                @Override
-                public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
-                    outShadowSize.set(view.getWidth(), view.getHeight());
-                    outShadowTouchPoint.set(view.getWidth() / 2, view.getHeight() / 2);
-                }
-            };
-            view.startDragAndDrop(null, shadowBuilder, position, 0);
-            boardAdapter.setPiece(position, null);
-            return true;
-        });
-
-        puzzleGrid.setOnDragListener((v, event) -> {
-            switch (event.getAction()) {
-                case DragEvent.ACTION_DRAG_STARTED:
-                    if (dragImageView != null) {
-                        dragImageView.setImageBitmap(currentDraggedBitmap);
-                        dragImageView.setX(event.getX() - largePieceSize/2f);
-                        dragImageView.setY(event.getY() - largePieceSize/2f);
-                    }
-                    return true;
-
-                case DragEvent.ACTION_DRAG_LOCATION:
-                    if (dragImageView != null) {
-                        dragImageView.setX(event.getX() - largePieceSize/2f);
-                        dragImageView.setY(event.getY() - largePieceSize/2f);
-                    }
-                    return true;
-
-                case DragEvent.ACTION_DROP:
-                    int toPosition = boardAdapter.getPositionFromCoordinates((int) event.getX(), (int) event.getY());
-
-                    if (toPosition >= 0 && !boardAdapter.isPositionFixed(toPosition)) {
-                        if (draggedFromBoard) {
-                            // Перемещение между позициями на поле
-                            if (boardAdapter.getItem(toPosition) == null) {
-                                boardAdapter.setPiece(toPosition, currentDraggedBitmap);
-                            } else {
-                                // Если место занято - возвращаем на исходную позицию
-                                boardAdapter.setPiece(draggedFromPosition, currentDraggedBitmap);
-                            }
-                        } else {
-                            // Перемещение из левой колонки на поле
-                            if (boardAdapter.getItem(toPosition) == null) {
-                                boardAdapter.setPiece(toPosition, currentDraggedBitmap);
-                                piecesAdapter.removePiece(draggedFromPosition);
-                                checkPuzzleComplete();
-                            } else {
-                                // Если место занято - возвращаем в левую колонку
-                                piecesAdapter.addPiece(currentDraggedBitmap, draggedFromPosition);
-                            }
-                        }
-                    } else {
-                        // Если не попали на поле - возвращаем обратно
-                        returnPieceToSource();
-                    }
-                    cleanupDrag(true);
-                    return true;
-
-                case DragEvent.ACTION_DRAG_ENDED:
-                    if (!event.getResult()) {
-                        returnPieceToSource();
-                    }
-                    cleanupDrag(event.getResult());
-                    return true;
+        puzzleGrid.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                return handleDragEvent(event);
             }
-            return false;
         });
+    }
+
+    private boolean startDragFromPieces(int position, View view) {
+        if (position == 0) return false;
+
+        Bitmap piece = piecesAdapter.getItem(position);
+        if (piece == null) return false;
+
+        currentDraggedBitmap = piece;
+        draggedFromPosition = position;
+        draggedFromBoard = false;
+        startDragOperation(view);
+        return true;
+    }
+
+    private boolean startDragFromBoard(int position, View view) {
+        if (boardAdapter.isPositionFixed(position)) return false;
+
+        Bitmap piece = boardAdapter.getItem(position);
+        if (piece == null) return false;
+
+        currentDraggedBitmap = piece;
+        draggedFromPosition = position;
+        draggedFromBoard = true;
+        boardAdapter.setPiece(position, null);
+        startDragOperation(view);
+        return true;
+    }
+
+    private void startDragOperation(View view) {
+        dragImageView = createDragImageView(currentDraggedBitmap);
+        View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view) {
+            @Override
+            public void onProvideShadowMetrics(Point outShadowSize, Point outShadowTouchPoint) {
+                outShadowSize.set(view.getWidth(), view.getHeight());
+                outShadowTouchPoint.set(view.getWidth() / 2, view.getHeight() / 2);
+            }
+        };
+        view.startDragAndDrop(null, shadowBuilder, draggedFromPosition, 0);
+    }
+
+    private boolean handleDragEvent(DragEvent event) {
+        switch (event.getAction()) {
+            case DragEvent.ACTION_DRAG_STARTED:
+                updateDragImagePosition(event);
+                return true;
+
+            case DragEvent.ACTION_DRAG_LOCATION:
+                updateDragImagePosition(event);
+                return true;
+
+            case DragEvent.ACTION_DROP:
+                handleDropEvent(event);
+                return true;
+
+            case DragEvent.ACTION_DRAG_ENDED:
+                if (!event.getResult()) {
+                    returnPieceToSource();
+                }
+                cleanupDrag(event.getResult());
+                return true;
+        }
+        return false;
+    }
+
+    private void updateDragImagePosition(DragEvent event) {
+        if (dragImageView != null) {
+            dragImageView.setX(event.getX() - largePieceSize/2f);
+            dragImageView.setY(event.getY() - largePieceSize/2f);
+        }
+    }
+
+    private void handleDropEvent(DragEvent event) {
+        int toPosition = boardAdapter.getPositionFromCoordinates((int) event.getX(), (int) event.getY());
+
+        if (toPosition >= 0 && !boardAdapter.isPositionFixed(toPosition)) {
+            if (draggedFromBoard) {
+                handleBoardToBoardMove(toPosition);
+            } else {
+                handlePiecesToBoardMove(toPosition);
+            }
+        } else {
+            returnPieceToSource();
+        }
+        cleanupDrag(true);
+    }
+
+    private void handleBoardToBoardMove(int toPosition) {
+        if (boardAdapter.getItem(toPosition) == null) {
+            boardAdapter.setPiece(toPosition, currentDraggedBitmap);
+        } else {
+            boardAdapter.setPiece(draggedFromPosition, currentDraggedBitmap);
+        }
+    }
+
+    private void handlePiecesToBoardMove(int toPosition) {
+        if (boardAdapter.getItem(toPosition) == null) {
+            boardAdapter.setPiece(toPosition, currentDraggedBitmap);
+            piecesAdapter.removePiece(draggedFromPosition);
+            checkPuzzleComplete();
+        } else {
+            piecesAdapter.addPiece(currentDraggedBitmap, draggedFromPosition);
+        }
     }
 
     private void returnPieceToSource() {
@@ -345,6 +399,20 @@ public class PuzzleActivity extends AppCompatActivity {
     private void checkPuzzleComplete() {
         if (boardAdapter.isPuzzleComplete()) {
             Toast.makeText(this, "Пазл собран!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Clean up bitmaps to prevent memory leaks
+        for (Bitmap piece : puzzlePieces) {
+            if (piece != null && !piece.isRecycled()) {
+                piece.recycle();
+            }
+        }
+        if (originalImage != null && !originalImage.isRecycled()) {
+            originalImage.recycle();
         }
     }
 }
