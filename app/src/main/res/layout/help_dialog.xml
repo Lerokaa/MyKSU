@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dor_dialog_background_1"
+    android:elevation="8dp">
+
+    <TextView
+        android:id="@+id/dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/nunito_black"
+        android:gravity="center"
+        android:text="Помощь"
+        android:textColor="#1E30D3"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/dialog_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:fontFamily="@font/nunito_bold"
+        android:lineSpacingExtra="4dp"
+        android:textColor="#000000"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/dialog_close"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/btn_text_background_1"
+        android:fontFamily="@font/nunito_black"
+        android:text="Закрыть"
+        android:textColor="#FFFFFF"
+        android:textColorLink="#1E30D1"
+        android:textSize="16sp" />
+</LinearLayout>
