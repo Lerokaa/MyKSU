@@ -1,3 +1,23 @@
 <resources>
-    <string name="app_name">MyKSU</string>
+    <string name="app_name">Угадай число</string>
+    <string name="todo">TODO</string>
+    <string name="back">Назад</string>
+    <string name="settings">Настройки</string>
+    <string name="help">Помощь</string>
+
+    <string name="guess_number_title">Угадай число</string>
+    <string name="enter_number_hint">Введите число от 1 до 100</string>
+    <string name="check_button">Проверить</string>
+    <string name="new_game_button">Новая игра</string>
+
+    <string name="tips_title">Советы</string>
+    <string name="tip1">• Начинайте с середины диапазона (50)</string>
+    <string name="tip2">• Следите за подсказками и корректируйте следующий ход</string>
+    <string name="understand_button">Понятно</string>
+
+    <!-- Добавленные строки -->
+    <string name="correct_guess">Ты угадал!</string>
+    <string name="attempts_count">Попыток: %d</string>
+    <string name="higher">Больше!</string>
+    <string name="lower">Меньше!</string>
 </resources>
