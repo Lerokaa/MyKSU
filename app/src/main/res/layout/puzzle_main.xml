@@ -58,12 +58,12 @@
             android:layout_marginBottom="8dp"/>
 
         <ImageButton
-            android:id="@+id/btnReset"
+            android:id="@+id/btnHelp"
             android:layout_width="59dp"
             android:layout_height="59dp"
-            android:src="@drawable/btn_icons_return_to_map"
+            android:src="@drawable/btn_icons_help"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Сбросить"/>
+            android:contentDescription="Помощь"/>
     </LinearLayout>
 
     <!-- Заголовок "Пазлы" -->
@@ -103,7 +103,7 @@
             android:stretchMode="columnWidth"/>
     </FrameLayout>
 
-    <!-- Нижняя панель с кусочками пазлов (такой же ширины как игровое поле) -->
+    <!-- Нижняя панель с кусочками пазлов -->
     <FrameLayout
         android:id="@+id/piecesContainer"
         android:layout_width="match_parent"
@@ -115,37 +115,17 @@
         <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:fillViewport="true">
 
             <LinearLayout
+                android:id="@+id/piecesLinearLayout"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="4dp">
-
-                <GridView
-                    android:id="@+id/piecesGrid"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:numColumns="15"
-                    android:horizontalSpacing="4dp"
-                    android:verticalSpacing="4dp"
-                    android:gravity="center"
-                    android:stretchMode="none"/>
+                android:padding="8dp">
             </LinearLayout>
         </HorizontalScrollView>
     </FrameLayout>
-
-    <!-- Кнопка Help -->
-    <ImageButton
-        android:id="@+id/btnHelp"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_above="@id/piecesContainer"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="8dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:contentDescription="Help"
-        android:src="@drawable/btn_icons_help" />
 </RelativeLayout>

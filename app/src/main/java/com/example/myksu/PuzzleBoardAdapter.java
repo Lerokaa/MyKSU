@@ -2,6 +2,7 @@ package com.example.myksu;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -34,7 +35,6 @@ public class PuzzleBoardAdapter extends BaseAdapter {
         this.fixedPieces = new boolean[count];
         this.gridView = gridView;
 
-        // Рассчитываем размер элемента на основе размера GridView
         gridView.post(() -> {
             int width = gridView.getWidth();
             if (width > 0) {
@@ -42,6 +42,19 @@ public class PuzzleBoardAdapter extends BaseAdapter {
                 notifyDataSetChanged();
             }
         });
+    }
+
+    public boolean isBoardFull() {
+        for (int i = 0; i < count; i++) {
+            if (boardPieces[i] == null && !fixedPieces[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public boolean isPieceCorrect(int position) {
+        if (boardPieces[position] == null) return false;
+        return boardPieces[position].sameAs(originalPieces.get(position));
     }
 
     public void setFixedPiece(int position, Bitmap piece) {
@@ -71,9 +84,9 @@ public class PuzzleBoardAdapter extends BaseAdapter {
         if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new GridView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT));
-            imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                    pieceSize,
+                    pieceSize));
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setAdjustViewBounds(true);
         } else {
             imageView = (ImageView) convertView;
@@ -81,8 +94,15 @@ public class PuzzleBoardAdapter extends BaseAdapter {
 
         if (boardPieces[position] != null) {
             imageView.setImageBitmap(boardPieces[position]);
+            // Подсвечиваем правильно размещенные пазлы
+            if (fixedPieces[position]) {
+                imageView.setBackgroundColor(Color.argb(50, 0, 255, 0));
+            } else {
+                imageView.setBackgroundColor(Color.TRANSPARENT);
+            }
         } else {
             imageView.setImageResource(emptyPieceResId);
+            imageView.setBackgroundColor(Color.TRANSPARENT);
         }
         return imageView;
     }

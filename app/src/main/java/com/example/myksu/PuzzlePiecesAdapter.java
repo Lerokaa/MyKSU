@@ -45,9 +45,9 @@ public class PuzzlePiecesAdapter extends BaseAdapter {
         if (convertView == null) {
             imageView = new ImageView(context);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(
-                    pieceSize,
-                    pieceSize));
-            imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    pieceSize, // ширина
+                    pieceSize)); // высота - такая же как ширина
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setAdjustViewBounds(true);
             imageView.setPadding(horizontalSpacing, 0, horizontalSpacing, 0);
         } else {
