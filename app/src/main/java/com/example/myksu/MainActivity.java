@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private void showStartConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Предупреждение");
-        builder.setMessage("Если вы начнёте новую игру, ваш текущий прогресс будет удалён. Хотите продолжить без сохранения?");
+        builder.setMessage("Если вы начнёте новую игру, ваш текущий прогресс будет удалён. Хотите начать сначала?");
 
         builder.setPositiveButton("OK", (dialog, which) -> {
             // Пользователь подтвердил - начинаем новую игру
