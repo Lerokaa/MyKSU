@@ -87,29 +87,6 @@ public class DormitoryData {
         }
     }
 
-    // Парсинг всего списка
-    public static List<Dormitory> parseDormitories(InputStream inputStream) {
-        Gson gson = new GsonBuilder().create();
-        InputStreamReader reader = new InputStreamReader(inputStream);
-
-        DormitoriesResponse response = gson.fromJson(reader, DormitoriesResponse.class);
-        return response.getDormitories();
-    }
-
-    // Поиск общежития по ID
-    public static Dormitory findDormitoryById(List<Dormitory> dormitories, int id) {
-        if (dormitories == null) {
-            return null;
-        }
-
-        for (Dormitory dorm : dormitories) {
-            if (dorm.getId() == id) {
-                return dorm;
-            }
-        }
-        return null; // Если не найдено
-    }
-
     // Новый метод: парсит JSON и сразу возвращает общежитие по ID
     public static Dormitory parseSingleDormitory(InputStream inputStream, int targetId) {
         Gson gson = new GsonBuilder().create();

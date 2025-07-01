@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -36,6 +37,7 @@
         <activity android:name=".CharactersDialogActivity" android:exported="true"/>
         <activity android:name=".InformationAboutKorpus" android:exported="true"/>
         <activity android:name=".InformationAboutObshagi" android:exported="true"/>
+        <activity android:name=".AchievementActivity" android:exported="true"/>
     </application>
 
 </manifest>
