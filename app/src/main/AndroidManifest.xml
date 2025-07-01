@@ -38,6 +38,7 @@
         <activity android:name=".InformationAboutKorpus" android:exported="true"/>
         <activity android:name=".InformationAboutObshagi" android:exported="true"/>
         <activity android:name=".AchievementActivity" android:exported="true"/>
+        <activity android:name=".GuessNumberActivity" android:exported="true" />
     </application>
 
 </manifest>
