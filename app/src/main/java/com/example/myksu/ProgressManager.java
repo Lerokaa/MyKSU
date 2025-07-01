@@ -29,17 +29,6 @@ public class ProgressManager {
                 flagsManager.isBuildingMiniGameCompleted(buildingId);
     }
 
-    public boolean isBuilding1Completed() {
-        return isBuildingFullyCompleted(1);
-    }
-
-    public boolean areAllBuildingsExcept11Completed() {
-        for (int i = 1; i <= 10; i++) {
-            if (!isBuildingFullyCompleted(i)) return false;
-        }
-        return true;
-    }
-
     public boolean areAllBuildingsCompleted() {
         for (int i = 1; i <= 11; i++) {
             if (!isBuildingFullyCompleted(i)) return false;
@@ -62,19 +51,42 @@ public class ProgressManager {
         return count;
     }
 
+    /**
+    * Возвращает массив статусов завершения зданий
+    * @return массив из 11 булевых значений (true если здание завершено)
+    */
+    public boolean[] getBuildingsCompletionStatus() {
+        boolean[] statuses = new boolean[11];
+        for (int i = 0; i < 11; i++) {
+            statuses[i] = isBuildingFullyCompleted(i + 1); // +1 потому что здания нумеруются с 1
+        }
+        return statuses;
+    }
+
+    /**
+     * Возвращает массив статусов просмотра информации об общежитиях
+     * @return массив из 6 булевых значений (true если информация просмотрена)
+     */
+    public boolean[] getDormitoriesViewStatus() {
+        boolean[] statuses = new boolean[6];
+        for (int i = 0; i < 6; i++) {
+            statuses[i] = flagsManager.isDormitoryInfoViewed(i + 1); // +1 потому что общежития нумеруются с 1
+        }
+        return statuses;
+    }
+
     public void completeBuilding(int buildingId) {
         flagsManager.setBuildingDialogCompleted(buildingId);
         flagsManager.setBuildingMiniGameCompleted(buildingId);
         checkForAchievements(buildingId);
     }
 
-    public boolean shouldShowBuildingDialog(int buildingId) {
-        return !flagsManager.isBuildingDialogCompleted(buildingId);
+    public boolean isWasBuildingDialog(int buildingId) {
+        return flagsManager.isBuildingDialogCompleted(buildingId);
     }
 
     public void completeBuildingDialog(int buildingId) {
         flagsManager.setBuildingDialogCompleted(buildingId);
-        checkForAchievements(buildingId);
     }
 
     public void isDormitoryInfoViewed(int dormitoryId) {
