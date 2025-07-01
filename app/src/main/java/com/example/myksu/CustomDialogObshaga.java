@@ -1,4 +1,5 @@
 package com.example.myksu;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -101,8 +102,13 @@ public class CustomDialogObshaga extends DialogFragment {
                 // Настройка кнопок
                 ImageButton detailsButton = view.findViewById(R.id.detailsButton);
                 detailsButton.setOnClickListener(v -> {
-                    // Обработка нажатия "Подробнее"
+                    // Используем requireContext() вместо this
+                    Intent intent = new Intent(requireActivity(), InformationAboutObshagi.class);
+                    intent.putExtra("DORMITORY_ID", dormitoryId);
+                    startActivity(intent);
 
+                    // Закрываем диалог после перехода (опционально)
+                    dismiss();
                 });
 
                 ImageButton routeButton = view.findViewById(R.id.routeButton);
