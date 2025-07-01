@@ -24,6 +24,7 @@ public class CustomDialogObshaga extends DialogFragment {
 
     private static final String ARG_DORMITORY_ID = "dormitory_id";
     private int dormitoryId;
+    ProgressManager progressManager;
 
     // Создаем новый экземпляр с передачей ID
     public static CustomDialogObshaga newInstance(int dormitoryId) {
@@ -40,6 +41,7 @@ public class CustomDialogObshaga extends DialogFragment {
         if (getArguments() != null) {
             dormitoryId = getArguments().getInt(ARG_DORMITORY_ID);
         }
+        progressManager = ProgressManager.getInstance();
     }
 
     @Nullable
@@ -78,6 +80,7 @@ public class CustomDialogObshaga extends DialogFragment {
                     imageView.setImageResource(R.drawable.other_placeholder_image);
                 }
 
+                progressManager.isDormitoryInfoViewed(dorm.getId());
                 // Заполняем текстовые поля
                 TextView Name = view.findViewById(R.id.name);
                 Name.setText(dorm.getName());

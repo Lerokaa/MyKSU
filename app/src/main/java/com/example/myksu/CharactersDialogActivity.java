@@ -40,6 +40,7 @@ public class CharactersDialogActivity extends AppCompatActivity {
     private List<String> phrases;
     private int currentPhraseIndex = 0;
     private BuildingData.Building currentBuilding;
+    ProgressManager progressManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +65,7 @@ public class CharactersDialogActivity extends AppCompatActivity {
 
             // Загрузка данных здания
             currentBuilding = loadBuildingData(id);
+            progressManager = ProgressManager.getInstance();
 
             // Инициализация UI
             initUI();
@@ -308,8 +310,9 @@ public class CharactersDialogActivity extends AppCompatActivity {
 //        // Можно добавить обработку завершения диалога
 //        characterText.setText("Диалог завершён");
 //        characterText.setClickable(false);
-
-         goToNextActivity();
+        progressManager.completeBuildingDialog(currentBuilding.getId());
+        progressManager.saveProgress(this);
+        goToNextActivity();
     }
 
     private void goToNextActivity() {
