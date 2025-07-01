@@ -166,8 +166,18 @@ public class InformationAboutKorpus extends AppCompatActivity {
         ImageButton startButton = findViewById(R.id.startButton);
         if (startButton != null) {
             startButton.setOnClickListener(v -> {
-                // Действие при нажатии "Начать"
+                Intent intent = new Intent(this, MapActivity.class);
+                startActivity(intent);
             });
+        }
+        ImageButton gameButton = findViewById(R.id.btn_continue);
+        if (gameButton != null) {
+            if (building.getId() == 1){
+            gameButton.setOnClickListener(v -> {
+                Intent intent = new Intent(this, GuessNumberActivity.class);
+                startActivity(intent);
+            });
+            }
         }
     }
 

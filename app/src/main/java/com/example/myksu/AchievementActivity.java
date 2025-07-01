@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class AchievementActivity extends AppCompatActivity {
@@ -63,6 +64,11 @@ public class AchievementActivity extends AppCompatActivity {
                 progressListBool.set(7, true);
             }
         }
+
+        Log.d("AchievementActivity", "Buildings progress: " + Arrays.toString(buildingsProgress));
+        Log.d("AchievementActivity", "Dorms progress: " + Arrays.toString(dormsProgress));
+        Log.d("AchievementActivity", "All buildings completed: " + progressManager.areAllBuildingsCompleted());
+        Log.d("AchievementActivity", "All dorms completed: " + progressManager.areAllDormitoriesCompleted());
 
         // Фильтруем достижения, оставляем только те, где progressListBool.get(i) == true
         List<Achievement> completedAchievements = new ArrayList<>();

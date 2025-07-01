@@ -188,7 +188,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:fontFamily="@font/nunito_black"
-                    android:text="Начать"
+                    android:text="На карту"
                     android:textColor="#ffffff"
                     android:textSize="16sp" />
             </RelativeLayout>
@@ -214,7 +214,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:fontFamily="@font/nunito_black"
-                    android:text="Продолжить"
+                    android:text="К игре"
                     android:textColor="#ffffff"
                     android:textSize="16sp" />
             </RelativeLayout>

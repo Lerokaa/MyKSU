@@ -22,11 +22,13 @@ public class GuessNumberActivity extends AppCompatActivity {
     private Button backToMapButton; // Новая кнопка для возврата на карту
     private int secretNumber;
     private int attemptsCount;
+    ProgressManager progressManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guess_number);
+        progressManager = ProgressManager.getInstance();
 
         // Инициализация элементов
         numberInput = findViewById(R.id.number_input);
@@ -89,11 +91,15 @@ public class GuessNumberActivity extends AppCompatActivity {
             attemptsCount++;
 
             if (guess == secretNumber) {
-                Toast.makeText(this, "Поздравляем! Вы угадали число за " + attemptsCount + " попыток!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Поздравляем! Вы получили достижение!", Toast.LENGTH_LONG).show();
                 checkButton.setVisibility(View.GONE);
                 newGameButton.setVisibility(View.VISIBLE);
                 backToMapButton.setVisibility(View.VISIBLE); // Показываем кнопку возврата
                 numberInput.setEnabled(false);
+                if (!progressManager.isGameBuilding(1)) {
+                    progressManager.completeGameBuilding(1);
+                    progressManager.saveProgress(this);
+                }
             } else if (guess < secretNumber) {
                 Toast.makeText(this, "Загаданное число больше", Toast.LENGTH_SHORT).show();
             } else {
