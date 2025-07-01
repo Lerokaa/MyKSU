@@ -19,9 +19,14 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.viewpager2.widget.ViewPager2;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -40,11 +45,32 @@ public class CharactersDialogActivity extends AppCompatActivity {
     private List<String> phrases;
     private int currentPhraseIndex = 0;
     private BuildingData.Building currentBuilding;
+    ProgressManager progressManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.characters_dialog);
+
+        View rootView = findViewById(R.id.characterCard); // Или любой другой видимый контейнер
+        Snackbar snackbar = Snackbar.make(
+                rootView,
+                "⚠ Внимание! ⚠\n" +
+                        "Диалог доступен только один раз. Просмотрите его до конца, " +
+                        "чтобы узнать информацию о корпусе " +
+                        "и сделать его доступным из любой точки мира. "+
+                        "Фразы меняются нажатием на текст",
+                Snackbar.LENGTH_INDEFINITE );// Показываем, пока пользователь не закроет
+        // Добавляем кнопку "OK" для закрытия
+        snackbar.setAction("OK", v -> snackbar.dismiss());
+
+        // Настраиваем внешний вид
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(ContextCompat.getColor(this, R.color.black));
+        TextView textView = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
+        textView.setMaxLines(6); // Разрешаем перенос строк
+
+        snackbar.show();
 
         // Получаем ID из Intent
         int id = getIntent().getIntExtra("DIALOG_ID", -1);
@@ -64,6 +90,7 @@ public class CharactersDialogActivity extends AppCompatActivity {
 
             // Загрузка данных здания
             currentBuilding = loadBuildingData(id);
+            progressManager = ProgressManager.getInstance();
 
             // Инициализация UI
             initUI();
@@ -308,8 +335,9 @@ public class CharactersDialogActivity extends AppCompatActivity {
 //        // Можно добавить обработку завершения диалога
 //        characterText.setText("Диалог завершён");
 //        characterText.setClickable(false);
-
-         goToNextActivity();
+        progressManager.completeBuildingDialog(currentBuilding.getId());
+        progressManager.saveProgress(this);
+        goToNextActivity();
     }
 
     private void goToNextActivity() {

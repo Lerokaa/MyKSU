@@ -77,6 +77,10 @@ public class ProgressManager {
         checkForAchievements(buildingId);
     }
 
+    public void isDormitoryInfoViewed(int dormitoryId) {
+        flagsManager.setDormitoryInfoViewed(dormitoryId);
+    }
+
     private void checkForAchievements(int buildingId) {
         if (isBuildingFullyCompleted(buildingId)) {
             // Логика выдачи достижения
