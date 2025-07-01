@@ -1,5 +1,6 @@
 package com.example.myksu;
 
+import androidx.appcompat.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -7,12 +8,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
+    ProgressManager progressManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,14 +27,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Настройка кнопки "Начать"
         ImageButton startButton = findViewById(R.id.startButton);
-        startButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, MapActivity.class);
-            startActivity(intent);
-        });
+        startButton.setOnClickListener(v -> showStartConfirmationDialog());
 
         // Настройка кнопки "Продолжить"
         ImageButton continueButton = findViewById(R.id.continueButton);
         continueButton.setOnClickListener(v -> {
+            // Всегда загружаем последнее сохранённое состояние (если есть)
+            progressManager.loadProgress(this);
+
+            // Переходим на карту в любом случае
             Intent intent = new Intent(MainActivity.this, MapActivity.class);
             startActivity(intent);
         });
@@ -39,6 +43,35 @@ public class MainActivity extends AppCompatActivity {
         // Настройка кнопки "Выход"
         ImageButton exitButton = findViewById(R.id.exitButton);
         exitButton.setOnClickListener(v -> finishAffinity());
+
+        progressManager = ProgressManager.getInstance();
+    }
+
+    private void showStartConfirmationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Предупреждение");
+        builder.setMessage("Если вы начнёте новую игру, ваш текущий прогресс будет удалён. Хотите продолжить без сохранения?");
+
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            // Пользователь подтвердил - начинаем новую игру
+            progressManager.resetAllProgress(this);
+            Intent intent = new Intent(MainActivity.this, MapActivity.class);
+            startActivity(intent);
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> {
+            // Пользователь отменил - ничего не делаем
+            dialog.dismiss();
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Можно дополнительно настроить внешний вид кнопок, если нужно
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        // Например, изменить цвет текста:
+        // positiveButton.setTextColor(getResources().getColor(R.color.your_color));
     }
 
     private void showSettingsDialog() {

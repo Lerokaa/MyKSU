@@ -132,8 +132,9 @@ public class ProgressManager {
         }
     }
 
-    public void resetAllProgress() {
+    public void resetAllProgress(Context context) {
         flagsManager.resetAllFlags();
-        // Дополнительные действия при сбросе
+        // Сохраняем сброшенные флаги
+        saveProgress(context);
     }
 }
