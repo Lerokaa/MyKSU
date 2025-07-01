@@ -67,25 +67,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     private static final int LOCATION_PERMISSION_REQUEST = 1;
     private static final float PROXIMITY_RADIUS = 52;
-    private static final String DIRECTIONS_API_KEY = "5b3ce3597851110001cf624884b1501b04444c8f9d22b4c100ef261c"; // API ключ OpenRouteService
+    private static final String DIRECTIONS_API_KEY = "5b3ce3597851110001cf624884b1501b04444c8f9d22b4c100ef261c";
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LatLng currentUserLocation;
-    private final Map<Marker, Boolean> buildingMarkers = new HashMap<>(); // Маркеры корпусов и их состояние
-    private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>(); // Маркеры общежитий
-    private final Map<Marker, Boolean> clickedMarkers = new HashMap<>(); // Состояние кликов по маркерам
-    private Marker currentSelectedMarker; // Текущий выбранный маркер
-    private Polyline currentRoute; // Текущий отображаемый маршрут
-    private final Map<Marker, Integer> buildingIds = new HashMap<>(); // ID корпусов
-    private final OkHttpClient httpClient = new OkHttpClient(); // HTTP-клиент для API запросов
+    private final Map<Marker, Boolean> buildingMarkers = new HashMap<>();
+    private final Map<Marker, Boolean> dormitoryMarkers = new HashMap<>();
+    private final Map<Marker, Boolean> clickedMarkers = new HashMap<>();
+    private Marker currentSelectedMarker;
+    private Polyline currentRoute;
+    private final Map<Marker, Integer> buildingIds = new HashMap<>();
+    private final OkHttpClient httpClient = new OkHttpClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        // Инициализация карты
         SupportMapFragment mapFragment = (SupportMapFragment)
                 getSupportFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
@@ -94,7 +93,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        // Кнопка для возврата к текущему местоположению
         ImageButton locationButton = findViewById(R.id.my_location_button);
         locationButton.setOnClickListener(v -> {
             if (currentUserLocation != null && mMap != null) {
@@ -105,7 +103,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             }
         });
 
-        // Кнопка навигации (возврат в главное меню)
         ImageButton navigationButton = findViewById(R.id.navigation_button);
         navigationButton.setOnClickListener(v -> {
             Intent intent = new Intent(MapActivity.this, MainActivity.class);
@@ -113,12 +110,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             finish();
         });
 
-        // Кнопка настроек
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         settingsButton.setOnClickListener(v -> showSettingsDialog());
     }
 
-    // Запрашивает последнее известное местоположение пользователя
     private void requestLastKnownLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -142,16 +137,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.setOnMarkerClickListener(this);
 
         try {
-            // Настройка элементов управления картой
             mMap.getUiSettings().setZoomControlsEnabled(true);
             mMap.getUiSettings().setCompassEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            // Добавление маркеров на карту
             addBuildingMarkers();
             addDormitoryMarkers();
 
-            // Центрирование карты на университете
             if (!buildingMarkers.isEmpty()) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(57.759625, 40.942470), 14));
@@ -166,20 +158,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Добавляет маркеры учебных корпусов на карту
     private void addBuildingMarkers() {
         List<LatLng> buildingLocations = Arrays.asList(
-                new LatLng(57.759625, 40.942470),  // Главный корпус (ID: 1)
-                new LatLng(57.766919, 40.918577),  // А1 корпус (ID: 2)
-                new LatLng(57.761681, 40.940083),  // Б корпус (ID: 3)
-                new LatLng(57.768314, 40.915687),  // Б1 корпус (ID: 4)
-                new LatLng(57.760810, 40.940021),  // В корпус (ID: 5)
-                new LatLng(57.767802, 40.917167), // В1 корпус (ID: 6)
-                new LatLng(57.767411, 40.917096),  // Г1 корпус (ID: 7)
-                new LatLng(57.760810, 40.940021),  // Д корпус (ID: 8)
-                new LatLng(57.736841, 40.920328), // Е корпус (ID: 9)
-                new LatLng(57.778410, 40.913353), // Спортивный корпус (ID: 10)
-                new LatLng(57.800863, 41.003536)  // ИПП корпус (ID: 11)
+                new LatLng(57.759625, 40.942470),
+                new LatLng(57.766919, 40.918577),
+                new LatLng(57.761681, 40.940083),
+                new LatLng(57.768314, 40.915687),
+                new LatLng(57.760810, 40.940021),
+                new LatLng(57.767802, 40.917167),
+                new LatLng(57.767411, 40.917096),
+                new LatLng(57.760810, 40.940021),
+                new LatLng(57.736841, 40.920328),
+                new LatLng(57.778410, 40.913353),
+                new LatLng(57.800863, 41.003536)
         );
 
         List<String> buildingTitles = Arrays.asList(
@@ -198,11 +189,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         for (int i = 0; i < buildingLocations.size(); i++) {
             try {
-                int iconRes = (i == 0) ? R.drawable.btn_icons_marker : R.drawable.btn_icons_non_marker;
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(buildingLocations.get(i))
                         .title(buildingTitles.get(i))
-                        .icon(BitmapDescriptorFactory.fromResource(iconRes))
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_non_marker))
                 );
 
                 if (marker != null) {
@@ -216,7 +206,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Добавляет маркеры общежитий на карту
     private void addDormitoryMarkers() {
         List<LatLng> dormitoryLocations = Arrays.asList(
                 new LatLng(57.754431, 40.952182),
@@ -253,8 +242,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Кастомное диалоговое окно (корпус недоступен)
-    private void showCustomDialog(String title, String message, boolean showRouteButton, Marker marker) {
+    private void showBuildingDialog(Marker marker) {
         try {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             LayoutInflater inflater = getLayoutInflater();
@@ -266,24 +254,20 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             Button routeButton = dialogView.findViewById(R.id.route_button);
             ImageButton closeButton = dialogView.findViewById(R.id.closeButton);
 
-            dialogTitle.setText(title);
-            dialogMessage.setText(message);
+            dialogTitle.setText("Корпус недоступен");
+            dialogMessage.setText("Подойдите к корпусу, чтобы получить больше информации о нем");
 
-            if (showRouteButton) {
-                routeButton.setVisibility(View.VISIBLE);
-                routeButton.setOnClickListener(v -> {
-                    try {
-                        buildRouteToBuilding(marker);
-                        ((AlertDialog) v.getTag()).dismiss();
-                    } catch (Exception e) {
-                        Log.e("MapActivity", "Error building route: " + e.getMessage());
-                        Toast.makeText(MapActivity.this, "Ошибка построения маршрута", Toast.LENGTH_SHORT).show();
-                    }
-                });
-                routeButton.setTag(builder.create());
-            } else {
-                routeButton.setVisibility(View.GONE);
-            }
+            routeButton.setVisibility(View.VISIBLE);
+            routeButton.setOnClickListener(v -> {
+                try {
+                    buildRouteToBuilding(marker);
+                    ((AlertDialog) v.getTag()).dismiss();
+                } catch (Exception e) {
+                    Log.e("MapActivity", "Error building route: " + e.getMessage());
+                    Toast.makeText(MapActivity.this, "Ошибка построения маршрута", Toast.LENGTH_SHORT).show();
+                }
+            });
+            routeButton.setTag(builder.create());
 
             AlertDialog dialog = builder.create();
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -296,7 +280,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Строит маршрут от текущего местоположения до выбранного здания
     private void buildRouteToBuilding(Marker destinationMarker) {
         if (currentUserLocation == null) {
             Toast.makeText(this, "Не удалось определить ваше местоположение", Toast.LENGTH_SHORT).show();
@@ -416,41 +399,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 return true;
             }
 
-            // Обновляем текущий выбранный маркер
             currentSelectedMarker = marker;
 
             if (buildingMarkers.containsKey(marker)) {
-                // Проверяем, является ли маркер активным (selected)
                 boolean isSelectedMarker = Boolean.TRUE.equals(buildingMarkers.get(marker));
 
                 if (isSelectedMarker) {
-                    // Для активного маркера сразу показываем карточку корпуса
                     int buildingNumber = getBuildingNumber(marker.getTitle());
                     Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
                     intent.putExtra("DIALOG_ID", buildingNumber);
                     startActivity(intent);
-                    Log.d("MapActivity", "Building number: " + buildingNumber);
                 } else {
-                    // Для неактивного маркера показываем всплывающее окно
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
-
-                    String buildingName = marker.getTitle();
-                    boolean showRouteButton = !"ИПП корпус".equals(buildingName);
-
-                    String message;
-                    if ("ИПП корпус".equals(buildingName)) {
-                        message = "Чтобы активировать данный корпус, нужно пройти оставшиеся корпуса КГУ";
-                    } else if ("Главный корпус".equals(buildingName)) {
-                        message = "Чтобы получить информацию об этом корпусе, подойдите к нему по GPS";
-                    } else {
-                        message = "Чтобы активировать данный корпус, нужно для начала пройти Главный корпус";
-                    }
-
-                    showCustomDialog("Корпус недоступен", message, showRouteButton, marker);
+                    showBuildingDialog(marker);
                 }
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked_two));
-                // Получаем номер из названия ("Общежитие №X")
                 String title = marker.getTitle();
                 int selectedDormitoryId = Integer.parseInt(title.replaceAll("[^0-9]", ""));
                 CustomDialogObshaga dialog = CustomDialogObshaga.newInstance(selectedDormitoryId);
@@ -465,7 +429,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Вспомогательный метод для определения номера корпуса
     private int getBuildingNumber(String buildingTitle) {
         switch (buildingTitle) {
             case "Главный корпус": return 1;
@@ -479,11 +442,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             case "Б1 корпус": return 4;
             case "Спортивный корпус": return 10;
             case "ИПП корпус": return 11;
-            default: return -1; // Неизвестный корпус
+            default: return -1;
         }
     }
 
-    // Включает отображение местоположения пользователя на карте
     private void enableMyLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -501,7 +463,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Запускает обновления местоположения пользователя
     private void startLocationUpdates() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -532,7 +493,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Проверяет близость пользователя к учебным корпусам
     private void checkProximityToBuildings() {
         if (currentUserLocation == null || mMap == null) {
             return;
@@ -562,10 +522,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                     }
                 } else {
                     if (entry.getValue()) {
-                        int iconRes = marker.getTitle().equals("Главный корпус")
-                                ? R.drawable.btn_icons_marker
-                                : R.drawable.btn_icons_non_marker;
-                        marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
+                        marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_non_marker));
                         buildingMarkers.put(marker, false);
                     }
                 }
@@ -575,7 +532,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Сбрасывает иконку маркера в исходное состояние
     private void resetMarkerIcon(@Nullable Marker marker) {
         if (marker == null) {
             return;
@@ -585,9 +541,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             if (buildingMarkers.containsKey(marker)) {
                 int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
                         ? R.drawable.btn_icons_marker_selected
-                        : (marker.getTitle().equals("Главный корпус")
-                        ? R.drawable.btn_icons_marker
-                        : R.drawable.btn_icons_non_marker);
+                        : R.drawable.btn_icons_non_marker;
                 marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two));
@@ -612,7 +566,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
-    // Показывает диалоговое окно настроек
     private void showSettingsDialog() {
         try {
             Dialog settingsDialog = new Dialog(this);
