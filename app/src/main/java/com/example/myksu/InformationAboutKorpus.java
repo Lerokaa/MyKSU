@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
@@ -11,6 +12,8 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager2.widget.ViewPager2;
+
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +24,24 @@ public class InformationAboutKorpus extends AppCompatActivity {
     private final Handler autoScrollHandler = new Handler();
     private Runnable autoScrollRunnable;
     private static final long AUTO_SCROLL_DELAY = 3000;
+    private BuildingData.Building building;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.information_about_korpus);
+
+        // Получаем ID корпуса из Intent
+        int buildingId = getIntent().getIntExtra("BUILDING_ID", 1); // 1 - значение по умолчанию
+
+        // Загружаем данные о корпусе
+        try {
+            InputStream inputStream = getResources().openRawResource(R.raw.buildings);
+            building = BuildingData.parseSingleBuilding(inputStream, buildingId);
+            inputStream.close();
+        } catch (Exception e) {
+            Log.e("BuildingData", "Error loading building data", e);
+        }
 
         initUI();
         setupTextContent();
@@ -40,16 +56,46 @@ public class InformationAboutKorpus extends AppCompatActivity {
 
     private void loadData() {
         TextView addressText = findViewById(R.id.addressText);
-        if (addressText != null) {  // Add null check for safety
+        if (addressText != null && building != null) {
+            addressText.setText(building.getShortName());
+        } else if (addressText != null) {
             addressText.setText("Главный корпус КГУ");
         }
     }
 
     private void setupCarousel() {
         List<Integer> images = new ArrayList<>();
-        images.add(R.drawable.other_photo1);
-        images.add(R.drawable.other_photo2);
-        images.add(R.drawable.other_photo3);
+
+        // Если есть фото в данных о корпусе
+        if (building != null && building.getPhotos() != null && !building.getPhotos().isEmpty()) {
+            for (String photoName : building.getPhotos()) {
+                try {
+                    // Получаем идентификатор ресурса по имени файла
+                    int resId = getResources().getIdentifier(
+                            photoName.toLowerCase().replace(".jpg", "").replace(".png", ""),
+                            "drawable",
+                            getPackageName()
+                    );
+
+                    if (resId != 0) {
+                        images.add(resId);
+                    } else {
+                        Log.e("Carousel", "Image not found: " + photoName);
+                        images.add(R.drawable.other_photo1); // Заглушка
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    images.add(R.drawable.other_photo1);
+                }
+            }
+        }
+
+        // Если фото нет в данных, используем дефолтные
+        if (images.isEmpty()) {
+            images.add(R.drawable.other_photo1);
+            images.add(R.drawable.other_photo2);
+            images.add(R.drawable.other_photo3);
+        }
 
         carouselAdapter = new CarouselAdapter(this, images);
         photosCarousel.setAdapter(carouselAdapter);
@@ -205,11 +251,63 @@ public class InformationAboutKorpus extends AppCompatActivity {
         TextView locationInfoText = findViewById(R.id.locationInfoText);
         TextView historyInfoText = findViewById(R.id.historyInfoText);
 
-        // Форматированный текст с переносами строк
-        String mainText = "Это мега супер крутой главный корпус!\n\n" +
-                "Он такой единственный и важный, вся Кострома от него строилась.\n\n" +
-                "Историческая справка: построен в 1965 году, является памятником архитектуры.\n\n" +
-                "Здесь находятся: ректорат, главные аудитории, научные лаборатории.";
+        if (building == null) {
+            // Дефолтные данные, если информация о корпусе не загружена
+            String mainText = "Полное название: Главный корпус КГУ\n\n" +
+                    "Адрес: ул. Примерная, 1\n\n" +
+                    "Про корпус: Это главный учебный корпус университета\n\n" +
+                    "Что находится в корпусе: ректорат, главные аудитории, научные лаборатории\n\n" +
+                    "Какие институты обучаются: Институт информатики, Институт строительства";
+
+            locationInfoText.setText(mainText);
+            historyInfoText.setText("Историческая справка: построен в 1965 году");
+            return;
+        }
+
+        // Формируем текст с нужными заголовками
+        StringBuilder mainText = new StringBuilder();
+
+        // 1. Полное название
+        mainText.append("Полное название: ")
+                .append(building.getFullName() != null ? building.getFullName() : "Не указано")
+                .append("\n\n");
+
+        // 2. Адрес
+        mainText.append("Адрес: ")
+                .append(building.getAddress() != null ? building.getAddress() : "Не указан")
+                .append("\n\n");
+
+        // 3. Про корпус (история)
+        mainText.append("Про корпус: ")
+                .append(building.getHistory() != null ? building.getHistory() : "Нет информации")
+                .append("\n\n");
+
+        String title = building.getTitleHave();
+        if (!title.isEmpty()) {
+            // 4. Что находится в корпусе
+            mainText.append(title).append(": ")
+                    .append(building.getSubHave() != null ? building.getSubHave() : "Нет информации")
+                    .append("\n\n");
+        }
+
+        // 5. Какие институты обучаются
+        mainText.append("Какие институты обучаются: ");
+        if (building.getInstitutes() != null && !building.getInstitutes().isEmpty()) {
+            for (String institute : building.getInstitutes()) {
+                mainText.append("\n- ").append(institute);
+            }
+        } else {
+            mainText.append("Нет информации");
+        }
+
+        locationInfoText.setText(mainText.toString());
+
+        // Дополнительная информация (если нужна)
+        if (building.getRelatedDormitories() != null && !building.getRelatedDormitories().isEmpty()) {
+            historyInfoText.setText("Связанные общежития: " + building.getRelatedDormitories().toString());
+        } else {
+            historyInfoText.setText("Дополнительная информация отсутствует");
+        }
 
         locationInfoText.setText(mainText);
         historyInfoText.setText("Общежитие №1\n(1 переулок Воскресенский, 17)");
