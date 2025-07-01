@@ -149,7 +149,7 @@
                     android:layout_height="wrap_content"
                     android:lineSpacingMultiplier="1"
                     android:padding="16dp"
-                    android:fontFamily="@font/nunito_black"
+                    android:fontFamily="@font/nunito_bold"
                     android:text=""
                     android:textColor="@android:color/black"
                     android:textSize="18sp"
@@ -221,7 +221,7 @@
                     android:layout_height="wrap_content"
                     android:layout_centerInParent="true"
                     android:fontFamily="@font/nunito_black"
-                    android:text="Начаать"
+                    android:text="Начать"
                     android:textColor="#ffffff"
                     android:textSize="16sp" />
             </RelativeLayout>
