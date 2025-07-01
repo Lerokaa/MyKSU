@@ -17,7 +17,6 @@
         android:theme="@style/Theme.MyKSU"
         tools:targetApi="31">
 
-
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAOL_tozvB5hMNVQJFFQe8Cz2tFA_pxbOA" />
@@ -31,13 +30,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
-
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
-    <activity android:name=".PuzzleActivity"></activity>
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".PuzzleActivity" />
+        <activity android:name=".CharactersDialogActivity" android:exported="true"/>
+        <activity android:name=".InformationAboutKorpus" android:exported="true"/>
+        <activity android:name=".InformationAboutObshagi" android:exported="true"/>
     </application>
 
 </manifest>
-
