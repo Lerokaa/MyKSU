@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.myksu">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -38,6 +39,11 @@
         <activity android:name=".InformationAboutKorpus" android:exported="true"/>
         <activity android:name=".InformationAboutObshagi" android:exported="true"/>
         <activity android:name=".AchievementActivity" android:exported="true"/>
-    </application>
 
+        <!-- Добавленная активность -->
+        <activity
+            android:name=".GuessNumberActivity"
+            android:exported="true" />
+
+    </application>
 </manifest>
