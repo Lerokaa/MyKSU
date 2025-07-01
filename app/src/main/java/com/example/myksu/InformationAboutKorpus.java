@@ -1,6 +1,7 @@
 package com.example.myksu;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -143,34 +144,27 @@ public class InformationAboutKorpus extends AppCompatActivity {
     }
 
     private void setupButtonListeners() {
+        // Настройка кнопки "Назад"
         ImageButton backButton = findViewById(R.id.backButton);
-        if (backButton != null) {
-            backButton.setOnClickListener(v -> finish());
-        }
+        backButton.setOnClickListener(v -> finish()); // Закрывает текущую Activity и возвращает на предыдущую
 
+        // Настройка кнопки "Settings"
         ImageButton settingsButton = findViewById(R.id.settingsButton);
         if (settingsButton != null) {
             settingsButton.setOnClickListener(v -> showSettingsDialog());
         }
 
-        ImageButton achievementsButton = findViewById(R.id.achievementsButton);
-        if (achievementsButton != null) {
-            achievementsButton.setOnClickListener(v -> {
-                // Обработчик кнопки "Достижения"
-            });
-        }
+        // Настройка кнопки достижений
+        ImageButton continueButton = findViewById(R.id.btnHint);
+        continueButton.setOnClickListener(v -> {
+            Intent intent = new Intent(InformationAboutKorpus.this, AchievementActivity.class);
+            startActivity(intent);
+        });
 
         ImageButton startButton = findViewById(R.id.startButton);
         if (startButton != null) {
             startButton.setOnClickListener(v -> {
                 // Действие при нажатии "Начать"
-            });
-        }
-
-        ImageButton continueButton = findViewById(R.id.continueButton);
-        if (continueButton != null) {
-            continueButton.setOnClickListener(v -> {
-                // Действие при нажатии "Продолжить"
             });
         }
     }
