@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Spannable;
@@ -78,6 +79,17 @@ public class CharactersDialogActivity extends AppCompatActivity {
             showErrorAndFinish("Ошибка: не передан ID корпуса");
             return;
         }
+
+        // Настройка кнопки "Назад"
+        ImageButton backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> finish()); // Закрывает текущую Activity и возвращает на предыдущую
+
+        // Настройка кнопки достижений
+        ImageButton continueButton = findViewById(R.id.achievementsButton);
+        continueButton.setOnClickListener(v -> {
+            Intent intent = new Intent(CharactersDialogActivity.this, AchievementActivity.class);
+            startActivity(intent);
+        });
 
         // Загружаем данные с подробным логированием
         try {
@@ -256,12 +268,14 @@ public class CharactersDialogActivity extends AppCompatActivity {
 
             // Принудительно устанавливаем nunito_b
             if (boldTypeface != null) {
-                builder.setSpan(
-                        new TypefaceSpan(boldTypeface),
-                        startPos,
-                        endPos,
-                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    builder.setSpan(
+                            new TypefaceSpan(boldTypeface),
+                            startPos,
+                            endPos,
+                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
+                }
             }
 
             builder.setSpan(
