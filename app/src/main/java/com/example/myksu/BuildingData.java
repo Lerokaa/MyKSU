@@ -15,7 +15,7 @@ public class BuildingData {
         private String fullName;
         private String address;
         private List<String> photos;
-        private List<Integer> relatedDormitories;
+        private List<String> relatedDormitories;
         private List<String> institutes;
         private String have;
         private String history;
@@ -26,7 +26,7 @@ public class BuildingData {
         public String getFullName() { return fullName; }
         public String getAddress() { return address; }
         public List<String> getPhotos() { return photos; }
-        public List<Integer> getRelatedDormitories() { return relatedDormitories; }
+        public List<String> getRelatedDormitories() { return relatedDormitories; }
         public List<String> getInstitutes() { return institutes; }
         public String getTitleHave() {
             if (have == null) return "";

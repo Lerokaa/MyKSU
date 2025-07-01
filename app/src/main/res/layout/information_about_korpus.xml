@@ -131,8 +131,8 @@
         <!-- Первый прямоугольник -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="16dp"
+            android:layout_height="320dp"
+
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="16dp"
             app:cardElevation="4dp">
@@ -148,7 +148,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:lineSpacingMultiplier="1"
-                    android:padding="16dp"
+                    android:paddingHorizontal="16dp"
                     android:fontFamily="@font/nunito_bold"
                     android:text=""
                     android:textColor="@android:color/black"
@@ -157,39 +157,6 @@
             </ScrollView>
         </androidx.cardview.widget.CardView>
 
-        <!-- Второй прямоугольник с иконкой -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:fontFamily="@font/nunito_black"
-            app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_marginEnd="16dp"
-                    android:contentDescription="История"
-                    android:src="@drawable/btn_icons_marker_two" />
-
-                <TextView
-                    android:id="@+id/historyInfoText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito_black"
-                    android:text=""
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
         <!-- Контейнер для кнопок (остается без изменений) -->
         <LinearLayout
             android:id="@+id/btn_layout"

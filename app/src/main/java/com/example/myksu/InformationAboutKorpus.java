@@ -249,7 +249,6 @@ public class InformationAboutKorpus extends AppCompatActivity {
 
     private void setupTextContent() {
         TextView locationInfoText = findViewById(R.id.locationInfoText);
-        TextView historyInfoText = findViewById(R.id.historyInfoText);
 
         if (building == null) {
             // Дефолтные данные, если информация о корпусе не загружена
@@ -260,7 +259,6 @@ public class InformationAboutKorpus extends AppCompatActivity {
                     "Какие институты обучаются: Институт информатики, Институт строительства";
 
             locationInfoText.setText(mainText);
-            historyInfoText.setText("Историческая справка: построен в 1965 году");
             return;
         }
 
@@ -300,16 +298,15 @@ public class InformationAboutKorpus extends AppCompatActivity {
             mainText.append("Нет информации");
         }
 
-        locationInfoText.setText(mainText.toString());
-
-        // Дополнительная информация (если нужна)
+        // 6. Связанные общежития (если есть)
         if (building.getRelatedDormitories() != null && !building.getRelatedDormitories().isEmpty()) {
-            historyInfoText.setText("Связанные общежития: " + building.getRelatedDormitories().toString());
-        } else {
-            historyInfoText.setText("Дополнительная информация отсутствует");
+            mainText.append("\n\n").append("В каких общежитиях проживают студенты:");
+            for (String dor : building.getRelatedDormitories())
+            {
+                mainText.append("\n- ").append(dor);
+            }
         }
 
-        locationInfoText.setText(mainText);
-        historyInfoText.setText("Общежитие №1\n(1 переулок Воскресенский, 17)");
+        locationInfoText.setText(mainText.toString());
     }
 }

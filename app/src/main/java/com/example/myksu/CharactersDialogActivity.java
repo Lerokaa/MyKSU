@@ -305,23 +305,22 @@ public class CharactersDialogActivity extends AppCompatActivity {
     }
 
     private void handleDialogComplete() {
-        // Можно добавить обработку завершения диалога
-        characterText.setText("Диалог завершён");
-        characterText.setClickable(false);
+//        // Можно добавить обработку завершения диалога
+//        characterText.setText("Диалог завершён");
+//        characterText.setClickable(false);
 
-        // Или автоматический переход
-        // goToNextActivity();
+         goToNextActivity();
     }
 
     private void goToNextActivity() {
-//        // Пример перехода на следующую активити
-//        Intent intent = new Intent(this, NextActivity.class);
-//
-//        // Можно передать дополнительные данные, если нужно
-//        intent.putExtra("SOME_KEY", currentDialog.getId());
-//
-//        startActivity(intent);
-//        finish(); // Закрываем текущую активити
+        // Пример перехода на следующую активити
+        Intent intent = new Intent(this, InformationAboutKorpus.class);
+
+        // Можно передать дополнительные данные, если нужно
+        intent.putExtra("BUILDING_ID", currentDialog.getId());
+
+        startActivity(intent);
+        finish(); // Закрываем текущую активити
     }
 
     private void setupCarousel() {
