@@ -39,7 +39,8 @@
         <activity android:name=".InformationAboutObshagi" android:exported="true"/>
         <activity android:name=".AchievementActivity" android:exported="true"/>
         <activity android:name=".GuessNumberActivity" android:exported="true" />
-        <activity android:name=".ColorConnectionActivity" android:exported="true"/>.
+        <activity android:name=".ColorConnectionActivity" android:exported="true"/>
+        <activity android:name=".BlockGameActivity" android:exported="true"/>.
     </application>
 
 </manifest>
