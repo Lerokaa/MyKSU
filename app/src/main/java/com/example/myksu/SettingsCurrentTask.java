@@ -11,6 +11,7 @@ public class SettingsCurrentTask {
     private TextView textView;
     ProgressManager progressManager;
     Context context;
+    int id =16;
 
     List<String> buildingTitles = Arrays.asList(
             "Главный корпус",
@@ -35,9 +36,30 @@ public class SettingsCurrentTask {
     }
 
 
-//    private List<String> checkComlectedCorpus()
-//    {
-//
-//    }
+    private int isTaskCorpus()
+    {
+        for (int i = 0; i == buildingTitles.size(); i++) {
+            boolean isComp = progressManager.isBuildingFullyCompleted(i+1);
+            if (!isComp)
+            { id = i;
+                break;
+            }
+        }
+        return id;
+    }
+
+    public void SetTask()
+    {
+        String s = "Вы все прошли";
+        if (id == 16)
+        {
+            textView.setText(s);
+        }
+        else
+        {
+            textView.setText(buildingTitles.get(id));
+        }
+
+    }
 
 }
