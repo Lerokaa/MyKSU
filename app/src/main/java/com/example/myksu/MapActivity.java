@@ -147,6 +147,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
             addBuildingMarkers();
             addDormitoryMarkers();
+            updateMarkersBasedOnProgress(); // Добавляем вызов здесь
 
             if (!buildingMarkers.isEmpty()) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -570,9 +571,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         try {
             if (buildingMarkers.containsKey(marker)) {
-                int iconRes = Boolean.TRUE.equals(buildingMarkers.get(marker))
-                        ? R.drawable.btn_icons_marker_selected
-                        : R.drawable.btn_icons_non_marker;
+                int buildingId = buildingIds.get(marker);
+                int iconRes;
+
+                if (progressManager.isWasBuildingDialog(buildingId)) {
+                    iconRes = R.drawable.btn_icons_marker;
+                } else if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
+                    iconRes = R.drawable.btn_icons_marker_selected;
+                } else {
+                    iconRes = R.drawable.btn_icons_non_marker;
+                }
+
                 marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two));
