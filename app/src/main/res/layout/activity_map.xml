@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Кнопка "Мое местоположение" -->
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Кнопка "Мое местоположение" -->
     <ImageButton
         android:id="@+id/my_location_button"
         android:layout_width="59dp"
@@ -38,7 +38,19 @@
         android:contentDescription="Настройки"
         android:scaleType="fitCenter"/>
 
-    <!-- Кнопка "Навигация" -->
+    <!-- Прогресс -->
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="100dp"
+        android:layout_height="14dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="55dp"
+        android:progressDrawable="@drawable/custom_progress"
+        android:progress="30"
+        android:indeterminate="false" />
+
     <ImageButton
         android:id="@+id/navigation_button"
         android:layout_width="59dp"
@@ -53,11 +65,36 @@
 
     <!-- Изображение задания внизу экрана -->
     <ImageView
-        android:id="@+id/task"
+        android:id="@+id/task_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:src="@drawable/other_task_background"
-        android:contentDescription="Текущее задание"
-        android:adjustViewBounds="true"/>
+        android:contentDescription="Фон задания"
+        android:adjustViewBounds="true" />
+
+    <TextView
+        android:id="@+id/task_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="45dp"
+        android:layout_marginLeft="85dp"
+        android:text="Текущее задание:"
+        android:textColor="#0413AA"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/nunito_black" />
+
+    <TextView
+        android:id="@+id/task_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="65dp"
+        android:fontFamily="@font/nunito_black"
+        android:text="Описание задания"
+        android:textColor="#000000"
+        android:textSize="14sp" />
 </FrameLayout>
