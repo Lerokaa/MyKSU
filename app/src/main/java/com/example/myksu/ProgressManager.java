@@ -51,6 +51,14 @@ public class ProgressManager {
         return count;
     }
 
+    public int getCompletedDormitoriesCount() {
+        int count = 0;
+        for (int i = 1; i <= 11; i++) {
+            if (flagsManager.isDormitoryInfoViewed(i)) count++;
+        }
+        return count;
+    }
+
     /**
     * Возвращает массив статусов завершения зданий
     * @return массив из 11 булевых значений (true если здание завершено)
