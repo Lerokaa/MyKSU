@@ -163,7 +163,7 @@ public class InformationAboutKorpus extends AppCompatActivity {
             startActivity(intent);
         });
 
-        ImageButton startButton = findViewById(R.id.startButton);
+        ImageButton startButton = findViewById(R.id.btn_start);
         if (startButton != null) {
             startButton.setOnClickListener(v -> {
                 Intent intent = new Intent(this, MapActivity.class);

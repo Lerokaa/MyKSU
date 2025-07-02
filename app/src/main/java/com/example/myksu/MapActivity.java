@@ -208,9 +208,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         for (int i = 0; i < buildingLocations.size(); i++) {
             try {
                 int buildingId = i + 1;
-                int iconRes = progressManager.isWasBuildingDialog(buildingId)
-                        ? R.drawable.btn_icons_marker
-                        : R.drawable.btn_icons_non_marker;
+                int iconRes;
+
+                if (progressManager.isWasBuildingDialog(buildingId)) {
+                    // Для зданий с пройденным диалогом - иконка btn_icons_marker
+                    iconRes = R.drawable.btn_icons_marker;
+                } else {
+                    // Для остальных - обычная иконка
+                    iconRes = R.drawable.btn_icons_non_marker;
+                }
 
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(buildingLocations.get(i))
@@ -425,22 +431,22 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             currentSelectedMarker = marker;
 
             if (buildingMarkers.containsKey(marker)) {
-                boolean isSelectedMarker = Boolean.TRUE.equals(buildingMarkers.get(marker));
+                int buildingId = buildingIds.get(marker);
+                boolean wasDialogCompleted = progressManager.isWasBuildingDialog(buildingId);
 
-                if (isSelectedMarker) {
-                    int buildingNumber = getBuildingNumber(marker.getTitle());
-                    boolean was = progressManager.isWasBuildingDialog(buildingNumber);
-                    if (was)
-                    {
-                        Intent intent = new Intent(MapActivity.this, InformationAboutKorpus.class);
-                        intent.putExtra("BUILDING_ID", buildingNumber);
-                        startActivity(intent);
-                    }
-                    else {
-                        Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
-                        intent.putExtra("DIALOG_ID", buildingNumber);
-                        startActivity(intent);
-                    }
+                // Для зданий с пройденным диалогом - всегда доступны
+                if (wasDialogCompleted) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
+                    Intent intent = new Intent(MapActivity.this, InformationAboutKorpus.class);
+                    intent.putExtra("BUILDING_ID", buildingId);
+                    startActivity(intent);
+                }
+                // Для остальных - проверяем доступность
+                else if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
+                    Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
+                    intent.putExtra("DIALOG_ID", buildingId);
+                    startActivity(intent);
                 } else {
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
                     showBuildingDialog(marker);
@@ -532,6 +538,12 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         for (Map.Entry<Marker, Boolean> entry : buildingMarkers.entrySet()) {
             Marker marker = entry.getKey();
+            int buildingId = buildingIds.get(marker);
+
+            // Пропускаем маркеры с пройденным диалогом
+            if (progressManager.isWasBuildingDialog(buildingId)) {
+                continue;
+            }
 
             if (marker.equals(currentSelectedMarker)) {
                 continue;
@@ -572,17 +584,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         try {
             if (buildingMarkers.containsKey(marker)) {
                 int buildingId = buildingIds.get(marker);
-                int iconRes;
 
                 if (progressManager.isWasBuildingDialog(buildingId)) {
-                    iconRes = R.drawable.btn_icons_marker;
+                    // Для зданий с пройденным диалогом - всегда иконка btn_icons_marker
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker));
                 } else if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
-                    iconRes = R.drawable.btn_icons_marker_selected;
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_selected));
                 } else {
-                    iconRes = R.drawable.btn_icons_non_marker;
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_non_marker));
                 }
-
-                marker.setIcon(BitmapDescriptorFactory.fromResource(iconRes));
             } else if (dormitoryMarkers.containsKey(marker)) {
                 marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_two));
             }
