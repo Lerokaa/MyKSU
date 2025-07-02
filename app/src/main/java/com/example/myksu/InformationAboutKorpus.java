@@ -178,6 +178,13 @@ public class InformationAboutKorpus extends AppCompatActivity {
                 startActivity(intent);
             });
             }
+            else {
+                gameButton.setOnClickListener(v -> {
+                    Intent intent = new Intent(this, ForTestGame.class);
+                    intent.putExtra("id", building.getId());
+                    startActivity(intent);
+                });
+            }
         }
     }
 

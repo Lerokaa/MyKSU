@@ -79,11 +79,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private Polyline currentRoute;
     private final Map<Marker, Integer> buildingIds = new HashMap<>();
     private final OkHttpClient httpClient = new OkHttpClient();
+    ProgressManager progressManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+        progressManager = ProgressManager.getInstance();
+        progressManager.loadProgress(this);
 
         // Инициализация карты
         SupportMapFragment mapFragment = (SupportMapFragment)
@@ -159,6 +162,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         }
     }
 
+    private void updateMarkersBasedOnProgress() {
+        for (Map.Entry<Marker, Integer> entry : buildingIds.entrySet()) {
+            Marker marker = entry.getKey();
+            int buildingId = entry.getValue();
+
+            if (progressManager.isWasBuildingDialog(buildingId)) {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker));
+            } else {
+                marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_non_marker));
+            }
+        }
+    }
+
     private void addBuildingMarkers() {
         List<LatLng> buildingLocations = Arrays.asList(
                 new LatLng(57.759625, 40.942470),
@@ -190,16 +206,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         for (int i = 0; i < buildingLocations.size(); i++) {
             try {
+                int buildingId = i + 1;
+                int iconRes = progressManager.isWasBuildingDialog(buildingId)
+                        ? R.drawable.btn_icons_marker
+                        : R.drawable.btn_icons_non_marker;
+
                 Marker marker = mMap.addMarker(new MarkerOptions()
                         .position(buildingLocations.get(i))
                         .title(buildingTitles.get(i))
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_non_marker))
+                        .icon(BitmapDescriptorFactory.fromResource(iconRes))
                 );
 
                 if (marker != null) {
                     buildingMarkers.put(marker, false);
                     clickedMarkers.put(marker, false);
-                    buildingIds.put(marker, i + 1);
+                    buildingIds.put(marker, buildingId);
                 }
             } catch (Exception e) {
                 Log.e("MapActivity", "Error adding building marker: " + e.getMessage());
@@ -407,9 +428,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                 if (isSelectedMarker) {
                     int buildingNumber = getBuildingNumber(marker.getTitle());
-                    Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
-                    intent.putExtra("DIALOG_ID", buildingNumber);
-                    startActivity(intent);
+                    boolean was = progressManager.isWasBuildingDialog(buildingNumber);
+                    if (was)
+                    {
+                        Intent intent = new Intent(MapActivity.this, InformationAboutKorpus.class);
+                        intent.putExtra("BUILDING_ID", buildingNumber);
+                        startActivity(intent);
+                    }
+                    else {
+                        Intent intent = new Intent(MapActivity.this, CharactersDialogActivity.class);
+                        intent.putExtra("DIALOG_ID", buildingNumber);
+                        startActivity(intent);
+                    }
                 } else {
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_clicked));
                     showBuildingDialog(marker);
