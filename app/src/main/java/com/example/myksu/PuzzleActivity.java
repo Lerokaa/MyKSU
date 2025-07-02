@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -374,14 +375,8 @@ public class PuzzleActivity extends AppCompatActivity {
         } else {
             // Если пазл сброшен не на игровое поле
             if (draggedFromBoard) {
-                // Возвращаем пазл в нижнюю панель только если его там нет
-                if (!containsBitmap(puzzlePieces, currentDraggedBitmap)) {
-                    puzzlePieces.add(currentDraggedBitmap);
-                    updatePiecesLayout();
-                } else {
-                    // Если такой пазл уже есть в нижней панели, возвращаем его обратно на доску
-                    boardAdapter.setPiece(draggedFromPosition, currentDraggedBitmap);
-                }
+                // Возвращаем пазл обратно на доску
+                boardAdapter.setPiece(draggedFromPosition, currentDraggedBitmap);
             }
         }
         cleanupDrag(true);
@@ -409,11 +404,20 @@ public class PuzzleActivity extends AppCompatActivity {
 
         Bitmap targetPiece = boardAdapter.getItem(toPosition);
         if (targetPiece == null) {
+            // Просто перемещаем пазл на пустое место
             boardAdapter.setPiece(toPosition, currentDraggedBitmap);
+            boardAdapter.setPiece(draggedFromPosition, null);
         } else {
-            // Меняем местами пазлы
-            boardAdapter.setPiece(toPosition, currentDraggedBitmap);
-            boardAdapter.setPiece(draggedFromPosition, targetPiece);
+            // Меняем местами пазлы только если оба не на своих местах
+            if (!originalPieces.get(toPosition).sameAs(targetPiece) &&
+                    !originalPieces.get(draggedFromPosition).sameAs(currentDraggedBitmap)) {
+
+                boardAdapter.setPiece(toPosition, currentDraggedBitmap);
+                boardAdapter.setPiece(draggedFromPosition, targetPiece);
+            } else {
+                // Если один из пазлов на своем месте, возвращаем обратно
+                boardAdapter.setPiece(draggedFromPosition, currentDraggedBitmap);
+            }
         }
     }
 
@@ -494,8 +498,22 @@ public class PuzzleActivity extends AppCompatActivity {
                 outShadowSize.set(largePieceSize, largePieceSize);
                 outShadowTouchPoint.set(largePieceSize / 2, largePieceSize / 2);
             }
+
+            @Override
+            public void onDrawShadow(Canvas canvas) {
+                // Рисуем стандартную тень с полупрозрачностью
+                Paint paint = new Paint();
+                paint.setColor(Color.argb(100, 0, 0, 0));
+                canvas.drawRect(0, 0, largePieceSize, largePieceSize, paint);
+
+                // Рисуем само изображение поверх тени
+                canvas.drawBitmap(currentDraggedBitmap, null,
+                        new Rect(0, 0, largePieceSize, largePieceSize), null);
+            }
         };
-        view.startDragAndDrop(null, shadowBuilder, draggedFromPosition, 0);
+
+        // Начинаем перетаскивание без данных, так как мы управляем всем вручную
+        view.startDragAndDrop(null, shadowBuilder, null, 0);
     }
 
     private ImageView createDragImageView(Bitmap piece) {
@@ -579,7 +597,7 @@ public class PuzzleActivity extends AppCompatActivity {
             showCompleteImage();
 
             // Показываем диалог через 5 секунд
-            new Handler().postDelayed(this::showSuccessDialog, 5000);
+            new Handler().postDelayed(this::showSuccessDialog, 2000);
         } else if (boardAdapter.isBoardFull() && !boardAdapter.isPuzzleComplete()) {
             Toast.makeText(this, "Не все пазлы на своих местах!", Toast.LENGTH_SHORT).show();
         }

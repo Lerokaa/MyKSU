@@ -74,7 +74,7 @@ public class CharactersDialogActivity extends AppCompatActivity {
         snackbar.show();
 
         // Получаем ID из Intent
-        int id = getIntent().getIntExtra("DIALOG_ID", -1);
+        int id = getIntent().getIntExtra("DIALOG_ID", 1);
         if (id == -1) {
             showErrorAndFinish("Ошибка: не передан ID корпуса");
             return;

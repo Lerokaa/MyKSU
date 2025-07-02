@@ -168,14 +168,14 @@
 
     <!-- Кнопка помощи -->
     <ImageButton
-        android:id="@+id/help_button"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:id="@+id/helpme_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Помощь"
         android:src="@drawable/btn_icons_help"
-        app:elevation="8dp"/>
+        app:elevation="8dp" />
 </RelativeLayout>

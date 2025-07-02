@@ -98,16 +98,16 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:horizontalSpacing="0dp"
-            android:verticalSpacing="0dp"
             android:numColumns="3"
-            android:stretchMode="columnWidth"/>
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="0dp" />
     </FrameLayout>
 
     <!-- Нижняя панель с кусочками пазлов -->
     <FrameLayout
         android:id="@+id/piecesContainer"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="16dp"
         android:background="@drawable/minigames_puzzle_board_bg">

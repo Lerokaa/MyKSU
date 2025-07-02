@@ -12,8 +12,8 @@
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="16dp"
         android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- Кнопка Назад -->
@@ -22,15 +22,14 @@
             android:layout_width="59dp"
             android:layout_height="59dp"
             android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
             android:src="@drawable/btn_icons_navigation"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:scaleType="fitCenter"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
         <!-- Колонка с кнопками настроек и достижений -->
-
         <ImageView
             android:id="@+id/logo"
             android:layout_width="wrap_content"
@@ -56,16 +55,16 @@
                 android:id="@+id/settingsButton"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:scaleType="fitCenter"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
                 android:src="@drawable/btn_icons_settings" />
 
             <ImageButton
                 android:id="@+id/achievementsButton"
                 android:layout_width="59dp"
                 android:layout_height="59dp"
-                android:scaleType="fitCenter"
                 android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="fitCenter"
                 android:src="@drawable/btn_icons_hint" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -73,7 +72,7 @@
     <!-- Прямоугольник с адресом (удлинённый) -->
     <androidx.cardview.widget.CardView
         android:id="@+id/addressCard"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         app:cardBackgroundColor="@color/white"
@@ -99,57 +98,51 @@
 
             <TextView
                 android:id="@+id/addressText"
-                android:layout_width="250dp"
+                android:layout_width="0dp"
                 android:layout_height="28dp"
+                android:layout_weight="1"
                 android:fontFamily="@font/nunito_black"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
-    <!-- Карусель фотографий -->
+    <!-- Карусель фотографий  -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/photosCarousel"
         android:layout_width="match_parent"
-        android:paddingTop="18dp"
         android:layout_height="300dp"
         android:layout_marginTop="0dp"
+        android:paddingTop="18dp"
         app:layout_constraintTop_toBottomOf="@id/addressCard" />
 
-
     <!-- Персонаж (внизу экрана под каруселью) -->
-
-    <!-- Карточка с текстом персонажа -->
     <ImageView
         android:id="@+id/characterImage"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="2dp"
-        android:adjustViewBounds="true"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/photosCarousel"
-        app:layout_constraintVertical_bias="0.079" />
+        android:layout_width="340dp"
+        android:layout_height="340dp"
+        android:layout_marginTop="-80dp"
+    android:layout_marginBottom="8dp"
+    android:adjustViewBounds="true"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/photosCarousel"
+    app:layout_constraintVertical_bias="0.0" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/characterCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
+        android:layout_marginBottom="15dp"
         app:cardBackgroundColor="@android:color/white"
         app:cardCornerRadius="20dp"
-        android:fontFamily="@font/nunito_bold"
-        android:layout_marginBottom="15dp"
         app:cardElevation="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="343dp"
             android:layout_height="wrap_content"
-
             android:layout_margin="10dp"
             android:orientation="vertical">
 
@@ -157,9 +150,9 @@
                 android:id="@+id/characterName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textColor="#0413AA"
                 android:fontFamily="@font/nunito_black"
+                android:textColor="#0413AA"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -167,8 +160,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="#000000"
                 android:fontFamily="@font/nunito_bold"
+                android:textColor="#000000"
                 android:textSize="18sp" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
