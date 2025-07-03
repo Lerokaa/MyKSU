@@ -69,7 +69,7 @@ public class MarkerManager {
             try {
                 int buildingId = i + 1;
                 int iconRes = progressManager.isWasBuildingDialog(buildingId)
-                        ? R.drawable.btn_icons_marker
+                        ? R.drawable.btn_icons_done
                         : R.drawable.btn_icons_non_marker;
 
                 Marker marker = mMap.addMarker(new MarkerOptions()
@@ -236,7 +236,7 @@ public class MarkerManager {
                 int buildingId = buildingIds.get(marker);
 
                 if (progressManager.isWasBuildingDialog(buildingId)) {
-                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker));
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_done));
                 } else if (Boolean.TRUE.equals(buildingMarkers.get(marker))) {
                     marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_selected));
                 } else {

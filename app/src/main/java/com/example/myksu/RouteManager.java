@@ -60,12 +60,10 @@ public class RouteManager {
             return;
         }
 
-        // Clear previous route if exists
         if (currentRoute != null) {
             currentRoute.remove();
         }
 
-        // Format coordinates as lon,lat for OpenRouteService
         String startPoint = currentUserLocation.longitude + "," + currentUserLocation.latitude;
         String endPoint = destinationMarker.getPosition().longitude + "," + destinationMarker.getPosition().latitude;
 
@@ -122,7 +120,7 @@ public class RouteManager {
 
                     for (int i = 0; i < coords.length(); i++) {
                         JSONArray coord = coords.getJSONArray(i);
-                        // Note: OpenRouteService returns [lon, lat] order
+
                         double lon = coord.getDouble(0);
                         double lat = coord.getDouble(1);
                         path.add(new LatLng(lat, lon));
@@ -169,12 +167,10 @@ public class RouteManager {
             return;
         }
 
-        // Clear previous route if exists
         if (currentRoute != null) {
             currentRoute.remove();
         }
 
-        // Format coordinates as lon,lat for OpenRouteService
         String startPoint = currentUserLocation.longitude + "," + currentUserLocation.latitude;
         String endPoint = dormitoryLocation.longitude + "," + dormitoryLocation.latitude;
 
@@ -231,7 +227,7 @@ public class RouteManager {
 
                     for (int i = 0; i < coords.length(); i++) {
                         JSONArray coord = coords.getJSONArray(i);
-                        // Note: OpenRouteService returns [lon, lat] order
+
                         double lon = coord.getDouble(0);
                         double lat = coord.getDouble(1);
                         path.add(new LatLng(lat, lon));
@@ -262,7 +258,7 @@ public class RouteManager {
 
     private void drawRouteOnMap(List<LatLng> path) {
         try {
-            // Clear previous route if exists
+
             if (currentRoute != null) {
                 currentRoute.remove();
             }
@@ -276,7 +272,6 @@ public class RouteManager {
             currentRoute = mMap.addPolyline(options);
             Log.d(TAG, "Route drawn with " + path.size() + " points");
 
-            // Zoom to show the entire route
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (LatLng point : path) {
                 builder.include(point);

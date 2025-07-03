@@ -63,6 +63,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             locationManager.initWithMap(mMap);
             markerManager.initWithMap(mMap);
             routeManager.initWithMap(mMap);
+            locationManager.setMarkerManager(markerManager);
 
             // Добавление маркеров
             markerManager.addBuildingMarkers();

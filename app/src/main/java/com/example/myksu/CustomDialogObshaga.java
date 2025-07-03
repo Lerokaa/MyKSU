@@ -31,7 +31,6 @@ public class CustomDialogObshaga extends DialogFragment {
     ProgressManager progressManager;
     private LatLng dormitoryLocation;
 
-    // Создаем новый экземпляр с передачей ID
     public static CustomDialogObshaga newInstance(int dormitoryId) {
         CustomDialogObshaga fragment = new CustomDialogObshaga();
         Bundle args = new Bundle();

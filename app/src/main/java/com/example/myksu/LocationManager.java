@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -96,7 +95,6 @@ public class LocationManager {
         if (currentUserLocation != null && mMap != null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUserLocation, 16));
         } else {
-            Toast.makeText(context, "Местоположение не получено", Toast.LENGTH_SHORT).show();
             requestLastKnownLocation();
         }
     }
