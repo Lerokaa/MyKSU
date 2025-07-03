@@ -66,13 +66,14 @@
             <!-- Заголовок -->
             <TextView
                 android:layout_width="match_parent"
+                android:fontFamily="@font/nunito_black"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:gravity="center"
                 android:text="Угадай число"
                 android:textColor="#3545D8"
                 android:textSize="28sp"
-                android:textStyle="bold" />
+                />
 
             <!-- Игровое поле -->
             <com.google.android.material.card.MaterialCardView
@@ -101,6 +102,7 @@
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/number_input"
                             android:layout_width="match_parent"
+                            android:fontFamily="@font/nunito_black"
                             android:layout_height="wrap_content"
                             android:inputType="number"
                             android:maxLength="3"
@@ -128,6 +130,7 @@
                                 android:layout_height="match_parent"
                                 android:gravity="center"
                                 android:text="Проверить"
+                                android:fontFamily="@font/nunito_black"
                                 android:textColor="#FFFFFF"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
@@ -168,14 +171,14 @@
 
     <!-- Кнопка помощи -->
     <ImageButton
-        android:id="@+id/help_button"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:id="@+id/helpme_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="32dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Помощь"
         android:src="@drawable/btn_icons_help"
-        app:elevation="8dp"/>
+        app:elevation="8dp" />
 </RelativeLayout>
