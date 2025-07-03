@@ -210,6 +210,9 @@ public class MarkerManager {
                     if (!entry.getValue()) {
                         marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.btn_icons_marker_selected));
                         buildingMarkers.put(marker, true);
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Нажми на корпус, чтобы узнать о нем больше", Toast.LENGTH_SHORT).show()
+                        );
                     }
                 } else {
                     if (entry.getValue()) {
