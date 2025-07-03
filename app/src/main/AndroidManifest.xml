@@ -40,6 +40,7 @@
         <activity android:name=".AchievementActivity" android:exported="true"/>
         <activity android:name=".GuessNumberActivity" android:exported="true" />
         <activity android:name=".ForTestGame" android:exported="true" />
+        <activity android:name=".Game2048Activity" android:exported="true" />
     </application>
 
 </manifest>

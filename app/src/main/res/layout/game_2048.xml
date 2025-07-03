@@ -1,0 +1,116 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/important_ksu_background"
+    android:padding="12dp">
+
+    <!-- Кнопка навигации -->
+
+    <!-- Центральная иконка -->
+    <ImageButton
+        android:id="@+id/navButton"
+        android:layout_width="59dp"
+        android:layout_height="59dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="10dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Назад"
+        android:src="@drawable/btn_icons_navigation" />
+
+    <ImageButton
+        android:id="@+id/centerButton"
+        android:layout_width="170dp"
+        android:layout_height="72dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Логотип"
+        android:src="@drawable/icons_ksu_logo_small" />
+
+    <!-- Иконки в правом верхнем углу -->
+    <LinearLayout
+        android:id="@+id/rightButtonsColumn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:gravity="end">
+
+        <ImageButton
+            android:id="@+id/btnShuffle"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:src="@drawable/btn_icons_settings"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Новая игра"
+            android:layout_marginBottom="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnHelp"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:src="@drawable/btn_icons_help"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Помощь"/>
+    </LinearLayout>
+
+    <!-- Заголовок -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/navButton"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="90dp"
+        android:fontFamily="@font/nunito_black"
+        android:text="2048"
+        android:textColor="#fff"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <!-- Отображение счета -->
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/titleText"
+        android:fontFamily="@font/nunito_black"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:text="Счет: 0"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <!-- Квадратное игровое поле -->
+    <FrameLayout
+        android:id="@+id/puzzleBoard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/scoreText"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/minigames_puzzle_board_bg_second"
+        android:padding="8dp">
+
+        <GridLayout
+            android:id="@+id/gameGrid"
+            android:layout_width="match_parent"
+            android:layout_height="355dp"
+            android:background="#ffffff"
+            android:fontFamily="@font/nunito_black"
+            android:columnCount="4"
+            android:padding="4dp"
+            android:rowCount="4" />
+
+        <Space
+            android:id="@+id/spaceBottom"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+    </FrameLayout>
+
+    <!-- Пустое пространство внизу для центрирования квадратного поля -->
+</RelativeLayout>

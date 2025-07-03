@@ -1,6 +1,7 @@
 package com.example.myksu;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
@@ -58,6 +59,38 @@ public class GuessNumberActivity extends AppCompatActivity {
         backToMapButton.setOnClickListener(v -> finish());
     }
 
+    private void showSuccessDialog() {
+        Dialog successDialog = new Dialog(this);
+        successDialog.setContentView(R.layout.success_dialog);
+
+        // Убираем стандартный заголовок и делаем прозрачный фон
+        successDialog.setTitle(null);
+        successDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Настраиваем размеры диалога и затемнение
+        Window window = successDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(window.getAttributes());
+            lp.width = (int) (300 * getResources().getDisplayMetrics().density);
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.dimAmount = 0.7f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+        }
+
+        // Кнопка продолжения
+        ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);
+        continueButton.setOnClickListener(v -> {
+            successDialog.dismiss();
+            // Создаем Intent для перехода к MapActivity
+            Intent intent = new Intent(GuessNumberActivity.this, MapActivity.class);
+            startActivity(intent);
+            finish(); // Закрываем текущую активность
+        });
+        successDialog.show();
+    }
+
     private void showHelpDialog() {
         Dialog helpDialog = new Dialog(this);
         helpDialog.setContentView(R.layout.guess_number_help_dialog);
@@ -71,13 +104,10 @@ public class GuessNumberActivity extends AppCompatActivity {
         if (window != null) {
             WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
             lp.copyFrom(window.getAttributes());
-            // Устанавливаем размеры (например, 300x400 dp)
             lp.width = (int) (300 * getResources().getDisplayMetrics().density);
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT; // Используем wrap_content для высоты
-            // Устанавливаем уровень затемнения
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
             lp.dimAmount = 0.7f;
             window.setAttributes(lp);
-            // Включаем флаг затемнения
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
 
@@ -120,11 +150,7 @@ public class GuessNumberActivity extends AppCompatActivity {
             attemptsCount++;
 
             if (guess == secretNumber) {
-                Toast.makeText(this, "Поздравляем! Вы получили достижение!", Toast.LENGTH_LONG).show();
-                checkButton.setVisibility(View.GONE);
-                newGameButton.setVisibility(View.VISIBLE);
-                backToMapButton.setVisibility(View.VISIBLE);
-                numberInput.setEnabled(false);
+                showSuccessDialog();
                 if (!progressManager.isGameBuilding(1)) {
                     progressManager.completeGameBuilding(1);
                     progressManager.saveProgress(this);
