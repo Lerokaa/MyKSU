@@ -44,6 +44,7 @@
         <activity android:name=".FlappyBirdActivity" android:exported="true" />
         <activity android:name=".ColorConnectionActivity" android:exported="true" />
         <activity android:name=".MemoryGameActivity" android:exported="true" />
+        <activity android:name=".DinoGameActivity" android:exported="true" />
     </application>
 
 </manifest>
