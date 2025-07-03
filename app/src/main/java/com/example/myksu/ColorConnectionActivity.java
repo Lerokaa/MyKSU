@@ -58,6 +58,8 @@ public class ColorConnectionActivity extends AppCompatActivity {
 
         ImageButton restartButton = findViewById(R.id.btnRestart);
         restartButton.setOnClickListener(v -> resetGame());
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
     }
 
     private void initializeViews() {
@@ -503,5 +505,23 @@ public class ColorConnectionActivity extends AppCompatActivity {
         exitButton.setOnClickListener(exitListener);
 
         settingsDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

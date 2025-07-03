@@ -31,6 +31,8 @@ public class InformationAboutKorpus extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.information_about_korpus);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         Log.e("BuildingData", "Error loading building data");
 
@@ -353,5 +355,13 @@ public class InformationAboutKorpus extends AppCompatActivity {
         }
 
         locationInfoText.setText(mainText.toString());
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

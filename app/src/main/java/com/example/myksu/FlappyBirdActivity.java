@@ -41,6 +41,8 @@ public class FlappyBirdActivity extends AppCompatActivity {
 
         initializeViews();
         setupGame();
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         ImageButton helpButton = findViewById(R.id.btnHelp);
         helpButton.setOnClickListener(v -> showHelpDialog());
@@ -424,5 +426,23 @@ public class FlappyBirdActivity extends AppCompatActivity {
             this.height = height;
             this.isTop = isTop;
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }
