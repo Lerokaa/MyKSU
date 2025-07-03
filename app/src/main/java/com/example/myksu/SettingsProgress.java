@@ -8,14 +8,14 @@ import java.util.List;
 
 public class SettingsProgress {
 
-    private ProgressBar progressBar;
+    private final ProgressBar progressBar;
     ProgressManager progressManager;
     Context context;
     private static final int MAX_COUNT = 16;
 
 
-    public SettingsProgress(ProgressBar pr)
-    {
+    public SettingsProgress(ProgressBar pr, Context ctx) {
+        context = ctx;
         progressManager = ProgressManager.getInstance();
         progressManager.loadProgress(context);
         progressBar = pr;
