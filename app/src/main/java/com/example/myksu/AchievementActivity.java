@@ -28,6 +28,8 @@ public class AchievementActivity extends AppCompatActivity {
         setContentView(R.layout.activity_achievement);
         progressManager = ProgressManager.getInstance();
         progressManager.loadProgress(this);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         // Настройка кнопки "Назад"
         ImageButton backButton = findViewById(R.id.backButton);
@@ -154,5 +156,22 @@ public class AchievementActivity extends AppCompatActivity {
         exitButton.setOnClickListener(exitListener);
 
         settingsDialog.show();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

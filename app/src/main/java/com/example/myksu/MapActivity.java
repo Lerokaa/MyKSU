@@ -83,6 +83,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        MusicManager.stopMusic();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         progressManager = ProgressManager.getInstance();

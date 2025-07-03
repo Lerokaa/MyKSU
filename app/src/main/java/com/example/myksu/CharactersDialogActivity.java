@@ -52,6 +52,8 @@ public class CharactersDialogActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.characters_dialog);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         View rootView = findViewById(R.id.characterCard); // Или любой другой видимый контейнер
         Snackbar snackbar = Snackbar.make(
@@ -543,5 +545,13 @@ public class CharactersDialogActivity extends AppCompatActivity {
         exitButton.setOnClickListener(exitListener);
 
         settingsDialog.show();
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

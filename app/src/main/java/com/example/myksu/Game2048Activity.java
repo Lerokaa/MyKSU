@@ -55,6 +55,9 @@ public class Game2048Activity extends AppCompatActivity {
         // Настройка кнопки настроек
         ImageButton settingsButton = findViewById(R.id.btnShuffle);
         settingsButton.setOnClickListener(v -> showSettingsDialog());
+
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
     }
 
     private void initializeViews() {
@@ -537,5 +540,23 @@ public class Game2048Activity extends AppCompatActivity {
         closeButton.setOnClickListener(v -> helpDialog.dismiss());
 
         helpDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

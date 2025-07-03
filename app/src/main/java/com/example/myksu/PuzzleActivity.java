@@ -72,6 +72,8 @@ public class PuzzleActivity extends AppCompatActivity {
             Log.e("PuzzleActivity", "Initialization error", e);
             finish();
         }
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
         // Настройка кнопки "Назад"
         ImageButton backButton = findViewById(R.id.navButton);
         backButton.setOnClickListener(v -> finish()); // Закрывает текущую Activity и возвращает на предыдущую
@@ -744,4 +746,17 @@ public class PuzzleActivity extends AppCompatActivity {
 
         settingsDialog.show();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
 }

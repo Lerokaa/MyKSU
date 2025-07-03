@@ -37,6 +37,8 @@ public class InformationAboutObshagi extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.information_about_obshagi);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         int dormitoryId = getIntent().getIntExtra("DORMITORY_ID", 1); // 1 - значение по умолчанию
 
@@ -285,5 +287,13 @@ public class InformationAboutObshagi extends AppCompatActivity {
 
     private void showSettingsDialog() {
         // Ваш существующий код для диалога настроек
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

@@ -37,6 +37,8 @@ public class MemoryGameActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.memory_game);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         initializeViews();
         setupGame();
@@ -360,5 +362,23 @@ public class MemoryGameActivity extends AppCompatActivity {
         });
 
         settingsDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
 
         // Настройка кнопки настроек
         ImageButton settingsButton = findViewById(R.id.settingsButton);
@@ -46,7 +48,22 @@ public class MainActivity extends AppCompatActivity {
 
         progressManager = ProgressManager.getInstance();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Не останавливаем музыку здесь, чтобы она продолжала играть при переходе между активностями
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
     private void showStartConfirmationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Предупреждение");

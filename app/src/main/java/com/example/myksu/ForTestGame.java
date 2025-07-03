@@ -29,6 +29,8 @@ public class ForTestGame extends AppCompatActivity {
         progressManager = ProgressManager.getInstance();
 
         setupButtonListeners();
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
     }
 
     private void setupButtonListeners() {
@@ -118,5 +120,23 @@ public class ForTestGame extends AppCompatActivity {
         }
 
         settingsDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }

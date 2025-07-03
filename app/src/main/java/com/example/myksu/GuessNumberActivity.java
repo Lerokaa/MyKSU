@@ -53,6 +53,9 @@ public class GuessNumberActivity extends AppCompatActivity {
         // Начало новой игры
         startNewGame();
 
+        // Запуск музыки
+        MusicManager.startMusic(this, R.raw.your_music);
+
         // Обработчики кнопок
         checkButton.setOnClickListener(v -> checkGuess());
         newGameButton.setOnClickListener(v -> startNewGame());
@@ -218,5 +221,23 @@ public class GuessNumberActivity extends AppCompatActivity {
         });
 
         settingsDialog.show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MusicManager.pauseMusic();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        MusicManager.resumeMusic();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        MusicManager.stopMusic();
     }
 }
