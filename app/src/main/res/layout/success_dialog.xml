@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:fontFamily="@font/nunito_black"
         android:gravity="center"
-        android:text="Поздравляем!\nВы прошли мини-игру!"
+        android:text="Поздравляем!\nВы прошли мини-игру!\nПолучено новое достижение!"
         android:textColor="@color/black"
         android:textSize="20sp"
         android:textStyle="bold" />
