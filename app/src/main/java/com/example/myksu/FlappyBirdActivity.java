@@ -34,10 +34,16 @@ public class FlappyBirdActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private final int TARGET_SCORE = 20;
 
+    int id;
+    ProgressManager progressManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_flappy_bird);
+
+        id = getIntent().getIntExtra("id", 1);
+        progressManager = ProgressManager.getInstance();
 
         initializeViews();
         setupGame();
@@ -97,6 +103,9 @@ public class FlappyBirdActivity extends AppCompatActivity {
             window.setAttributes(lp);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
+
+        progressManager.completeGameBuilding(id);
+        progressManager.saveProgress(this);
 
         ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);
         continueButton.setOnClickListener(v -> {

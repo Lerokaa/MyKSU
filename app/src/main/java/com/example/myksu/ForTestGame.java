@@ -17,7 +17,7 @@ import java.io.InputStream;
 
 public class ForTestGame extends AppCompatActivity {
 
-    int corp_id;
+    int id;
     ProgressManager progressManager;
 
     @Override
@@ -25,7 +25,7 @@ public class ForTestGame extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.for_test_game);
 
-        corp_id = getIntent().getIntExtra("id", 1);
+        id = getIntent().getIntExtra("id", 1);
         progressManager = ProgressManager.getInstance();
 
         setupButtonListeners();
@@ -52,12 +52,12 @@ public class ForTestGame extends AppCompatActivity {
         });
 
         TextView corp = findViewById(R.id.titleText);
-        corp.append(String.valueOf(corp_id));
+        corp.append(String.valueOf(id));
 
         ImageButton startButton = findViewById(R.id.startButton);
         if (startButton != null) {
             startButton.setOnClickListener(v -> {
-                progressManager.completeGameBuilding(corp_id);
+                progressManager.completeGameBuilding(id);
                 progressManager.saveProgress(this);
                 Intent intent = new Intent(this, MapActivity.class);
                 startActivity(intent);

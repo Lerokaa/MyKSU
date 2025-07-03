@@ -25,12 +25,15 @@ public class GuessNumberActivity extends AppCompatActivity {
     private int secretNumber;
     private int attemptsCount;
     ProgressManager progressManager;
+    int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guess_number);
         progressManager = ProgressManager.getInstance();
+
+        id = getIntent().getIntExtra("id", 1);
 
         // Инициализация элементов
         numberInput = findViewById(R.id.number_input);
@@ -154,10 +157,8 @@ public class GuessNumberActivity extends AppCompatActivity {
 
             if (guess == secretNumber) {
                 showSuccessDialog();
-                if (!progressManager.isGameBuilding(1)) {
-                    progressManager.completeGameBuilding(1);
-                    progressManager.saveProgress(this);
-                }
+                progressManager.completeGameBuilding(id);
+                progressManager.saveProgress(this);
             } else if (guess < secretNumber) {
                 Toast.makeText(this, "Загаданное число больше", Toast.LENGTH_SHORT).show();
             } else {

@@ -182,37 +182,47 @@ public class InformationAboutKorpus extends AppCompatActivity {
                 switch (buildingId) {
                     case 1:
                         intent = new Intent(this, GuessNumberActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 2:
-                        intent = new Intent(this, ForTestGame.class);
+                        intent = new Intent(this, GuessNumberActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 3:
                         intent = new Intent(this, PuzzleActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 4:
                         intent = new Intent(this, FlappyBirdActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 5:
                         intent = new Intent(this, Game2048Activity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 6:
-                        intent = new Intent(this, ForTestGame.class);
+                        intent = new Intent(this, Game2048Activity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 7:
-                        intent = new Intent(this, ForTestGame.class);
+                        intent = new Intent(this, FlappyBirdActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 11:
                         intent = new Intent(this, MemoryGameActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 9:
                         intent = new Intent(this, ColorConnectionActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     case 10:
-                        intent = new Intent(this, ForTestGame.class);
+                        intent = new Intent(this, MemoryGameActivity.class);
+                        intent.putExtra("id", buildingId);
                         break;
                     default:
                         // Для всех остальных ID используем ForTestGame
-                        intent = new Intent(this, ForTestGame.class);
+                        intent = new Intent(this, MemoryGameActivity.class);
                         intent.putExtra("id", buildingId);
                         break;
                 }
