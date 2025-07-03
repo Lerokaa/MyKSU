@@ -39,10 +39,16 @@ public class ColorConnectionActivity extends AppCompatActivity {
     private int cellWidth, cellHeight;
     private final int TARGET_SCORE = 10;
 
+    int id;
+    ProgressManager progressManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_color);
+
+        id = getIntent().getIntExtra("id", 1);
+        progressManager = ProgressManager.getInstance();
 
         initializeViews();
         setupGame();
@@ -103,6 +109,9 @@ public class ColorConnectionActivity extends AppCompatActivity {
             window.setAttributes(lp);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
+
+        progressManager.completeGameBuilding(id);
+        progressManager.saveProgress(this);
 
         // Кнопка продолжения
         ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);

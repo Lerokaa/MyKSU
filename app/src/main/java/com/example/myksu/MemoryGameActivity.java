@@ -33,10 +33,16 @@ public class MemoryGameActivity extends AppCompatActivity {
     private final int TOTAL_PAIRS = 8; // 4x4 grid = 16 cards = 8 pairs
     private int gridSize = 4; // 4x4 grid
 
+    int id;
+    ProgressManager progressManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.memory_game);
+
+        id = getIntent().getIntExtra("id", 1);
+        progressManager = ProgressManager.getInstance();
         // Запуск музыки
         MusicManager.startMusic(this, R.raw.your_music);
 
@@ -94,6 +100,9 @@ public class MemoryGameActivity extends AppCompatActivity {
             window.setAttributes(lp);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
+
+        progressManager.completeGameBuilding(id);
+        progressManager.saveProgress(this);
 
         ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);
         continueButton.setOnClickListener(v -> {

@@ -56,10 +56,17 @@ public class PuzzleActivity extends AppCompatActivity {
     private int draggedFromPosition = -1;
     private boolean draggedFromBoard = false;
 
+    ProgressManager progressManager;
+    int id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.puzzle_main);
+
+        progressManager = ProgressManager.getInstance();
+
+        id = getIntent().getIntExtra("BUILDING_ID", 1);
 
         try {
             initializeViews();
@@ -597,6 +604,9 @@ public class PuzzleActivity extends AppCompatActivity {
 
             // Показываем полное изображение
             showCompleteImage();
+
+            progressManager.completeGameBuilding(id);
+            progressManager.saveProgress(this);
 
             // Показываем диалог через 5 секунд
             new Handler().postDelayed(this::showSuccessDialog, 2000);

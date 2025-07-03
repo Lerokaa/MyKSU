@@ -35,10 +35,16 @@ public class Game2048Activity extends AppCompatActivity {
     private TextView[][] tileViews = new TextView[GRID_SIZE][GRID_SIZE];
     private GestureDetector gestureDetector;
 
+    int id;
+    ProgressManager progressManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_2048);
+
+        id = getIntent().getIntExtra("id", 1);
+        progressManager = ProgressManager.getInstance();
 
         initializeViews();
         setupGame();
@@ -411,6 +417,9 @@ public class Game2048Activity extends AppCompatActivity {
             window.setAttributes(lp);
             window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
+
+        progressManager.completeGameBuilding(id);
+        progressManager.saveProgress(this);
 
         // Кнопка продолжения
         ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);
