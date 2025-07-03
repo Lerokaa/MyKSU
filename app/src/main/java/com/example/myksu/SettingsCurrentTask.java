@@ -14,22 +14,23 @@ public class SettingsCurrentTask {
     int id =16;
 
     List<String> buildingTitles = Arrays.asList(
-            "Главный корпус",
-            "А1 корпус",
-            "Б корпус",
-            "Б1 корпус",
-            "В корпус",
-            "В1 корпус",
-            "Г1 корпус",
-            "Д корпус",
-            "Е корпус",
-            "Спортивный корпус",
-            "ИПП корпус"
+            "Главном корпусе",
+            "А1 корпусе",
+            "Б корпусе",
+            "Б1 корпусе",
+            "В корпусе",
+            "В1 корпусе",
+            "Г1 корпусе",
+            "Д корпусе",
+            "Е корпусе",
+            "Спортивном корпусе",
+            "ИПП корпусе"
     );
 
 
-    public SettingsCurrentTask(TextView te)
+    public SettingsCurrentTask(TextView te, Context ctx)
     {
+        context = ctx;
         progressManager = ProgressManager.getInstance();
         progressManager.loadProgress(context);
         textView = te;
@@ -38,7 +39,8 @@ public class SettingsCurrentTask {
 
     private int isTaskCorpus()
     {
-        for (int i = 0; i == buildingTitles.size(); i++) {
+        for (int i = 0; i < buildingTitles.size(); i++)
+        {
             boolean isComp = progressManager.isBuildingFullyCompleted(i+1);
             if (!isComp)
             { id = i;
@@ -50,6 +52,7 @@ public class SettingsCurrentTask {
 
     public void SetTask()
     {
+        id = isTaskCorpus();
         String s = "Вы все прошли";
         if (id == 16)
         {
@@ -57,7 +60,7 @@ public class SettingsCurrentTask {
         }
         else
         {
-            textView.setText(buildingTitles.get(id));
+            textView.setText(String.format("Пройдите игру в %s", buildingTitles.get(id)));
         }
 
     }
