@@ -172,19 +172,51 @@ public class InformationAboutKorpus extends AppCompatActivity {
         }
         ImageButton gameButton = findViewById(R.id.btn_continue);
         if (gameButton != null) {
-            if (building.getId() == 1){
+            int buildingId = building.getId();
+
             gameButton.setOnClickListener(v -> {
-                Intent intent = new Intent(this, GuessNumberActivity.class);
+                Intent intent;
+
+                switch (buildingId) {
+                    case 1:
+                        intent = new Intent(this, GuessNumberActivity.class);
+                        break;
+                    case 2:
+                        intent = new Intent(this, ForTestGame.class);
+                        break;
+                    case 3:
+                        intent = new Intent(this, PuzzleActivity.class);
+                        break;
+                    case 4:
+                        intent = new Intent(this, FlappyBirdActivity.class);
+                        break;
+                    case 5:
+                        intent = new Intent(this, Game2048Activity.class);
+                        break;
+                    case 6:
+                        intent = new Intent(this, ForTestGame.class);
+                        break;
+                    case 7:
+                        intent = new Intent(this, ForTestGame.class);
+                        break;
+                    case 11:
+                        intent = new Intent(this, MemoryGameActivity.class);
+                        break;
+                    case 9:
+                        intent = new Intent(this, ColorConnectionActivity.class);
+                        break;
+                    case 10:
+                        intent = new Intent(this, ForTestGame.class);
+                        break;
+                    default:
+                        // Для всех остальных ID используем ForTestGame
+                        intent = new Intent(this, ForTestGame.class);
+                        intent.putExtra("id", buildingId);
+                        break;
+                }
+
                 startActivity(intent);
             });
-            }
-            else {
-                gameButton.setOnClickListener(v -> {
-                    Intent intent = new Intent(this, ForTestGame.class);
-                    intent.putExtra("id", building.getId());
-                    startActivity(intent);
-                });
-            }
         }
     }
 
