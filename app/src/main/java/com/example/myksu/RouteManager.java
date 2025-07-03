@@ -151,6 +151,115 @@ public class RouteManager {
         });
     }
 
+    public void buildRouteToDormitory(LatLng dormitoryLocation) {
+        LatLng currentUserLocation = activity.getLocationManager().getCurrentUserLocation();
+
+        if (currentUserLocation == null) {
+            Log.e(TAG, "Current user location is null");
+            activity.runOnUiThread(() ->
+                    Toast.makeText(activity, "Не удалось определить ваше местоположение", Toast.LENGTH_SHORT).show());
+            activity.getLocationManager().requestLastKnownLocation();
+            return;
+        }
+
+        if (dormitoryLocation == null) {
+            Log.e(TAG, "Invalid dormitory location");
+            activity.runOnUiThread(() ->
+                    Toast.makeText(activity, "Неверное расположение общежития", Toast.LENGTH_SHORT).show());
+            return;
+        }
+
+        // Clear previous route if exists
+        if (currentRoute != null) {
+            currentRoute.remove();
+        }
+
+        // Format coordinates as lon,lat for OpenRouteService
+        String startPoint = currentUserLocation.longitude + "," + currentUserLocation.latitude;
+        String endPoint = dormitoryLocation.longitude + "," + dormitoryLocation.latitude;
+
+        String url = "https://api.openrouteservice.org/v2/directions/foot-walking?" +
+                "api_key=" + DIRECTIONS_API_KEY +
+                "&start=" + startPoint +
+                "&end=" + endPoint;
+
+        Log.d(TAG, "Requesting route from: " + startPoint + " to " + endPoint);
+        Log.d(TAG, "API URL: " + url);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("Accept", "application/json, application/geo+json")
+                .addHeader("Authorization", DIRECTIONS_API_KEY)
+                .build();
+
+        httpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                Log.e(TAG, "Route request failed", e);
+                activity.runOnUiThread(() ->
+                        Toast.makeText(activity, "Ошибка подключения: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) {
+                try {
+                    if (!response.isSuccessful()) {
+                        String errorBody = response.body() != null ? response.body().string() : "null";
+                        Log.e(TAG, "Unsuccessful response: " + response.code() + " - " + errorBody);
+                        throw new IOException("HTTP error code: " + response.code());
+                    }
+
+                    String responseData = response.body().string();
+                    Log.d(TAG, "API Response: " + responseData);
+
+                    JSONObject json = new JSONObject(responseData);
+                    JSONArray features = json.getJSONArray("features");
+
+                    if (features.length() == 0) {
+                        throw new Exception("No features in response");
+                    }
+
+                    JSONObject route = features.getJSONObject(0);
+                    JSONObject geometry = route.getJSONObject("geometry");
+
+                    if (!geometry.getString("type").equals("LineString")) {
+                        throw new Exception("Unsupported geometry type: " + geometry.getString("type"));
+                    }
+
+                    JSONArray coords = geometry.getJSONArray("coordinates");
+                    List<LatLng> path = new ArrayList<>();
+
+                    for (int i = 0; i < coords.length(); i++) {
+                        JSONArray coord = coords.getJSONArray(i);
+                        // Note: OpenRouteService returns [lon, lat] order
+                        double lon = coord.getDouble(0);
+                        double lat = coord.getDouble(1);
+                        path.add(new LatLng(lat, lon));
+                        Log.d(TAG, "Route point " + i + ": " + lat + ", " + lon);
+                    }
+
+                    if (path.isEmpty()) {
+                        Log.e(TAG, "Empty path decoded");
+                        activity.runOnUiThread(() ->
+                                Toast.makeText(activity, "Не удалось декодировать путь", Toast.LENGTH_LONG).show());
+                        return;
+                    }
+
+                    activity.runOnUiThread(() -> drawRouteOnMap(path));
+
+                } catch (Exception e) {
+                    Log.e(TAG, "Error processing route", e);
+                    activity.runOnUiThread(() ->
+                            Toast.makeText(activity, "Ошибка обработки маршрута: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                } finally {
+                    if (response.body() != null) {
+                        response.body().close();
+                    }
+                }
+            }
+        });
+    }
+
     private void drawRouteOnMap(List<LatLng> path) {
         try {
             // Clear previous route if exists
