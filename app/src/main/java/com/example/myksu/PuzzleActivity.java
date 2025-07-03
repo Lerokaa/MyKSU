@@ -643,20 +643,34 @@ public class PuzzleActivity extends AppCompatActivity {
     }
 
     private void showSuccessDialog() {
-        successDialog = new Dialog(this);
+        Dialog successDialog = new Dialog(this);
         successDialog.setContentView(R.layout.success_dialog);
-        successDialog.setCancelable(false);
 
-        if (successDialog.getWindow() != null) {
-            successDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        // Убираем стандартный заголовок и делаем прозрачный фон
+        successDialog.setTitle(null);
+        successDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Настраиваем размеры диалога и затемнение
+        Window window = successDialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(window.getAttributes());
+            lp.width = (int) (300 * getResources().getDisplayMetrics().density);
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.dimAmount = 0.7f;
+            window.setAttributes(lp);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
         }
 
+        // Кнопка продолжения
         ImageButton continueButton = successDialog.findViewById(R.id.dialog_continue);
         continueButton.setOnClickListener(v -> {
             successDialog.dismiss();
-            finish();
+            // Создаем Intent для перехода к MapActivity
+            Intent intent = new Intent(PuzzleActivity.this, MapActivity.class);
+            startActivity(intent);
+            finish(); // Закрываем текущую активность
         });
-
         successDialog.show();
     }
 
