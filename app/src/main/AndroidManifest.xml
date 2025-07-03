@@ -41,6 +41,7 @@
         <activity android:name=".GuessNumberActivity" android:exported="true" />
         <activity android:name=".ForTestGame" android:exported="true" />
         <activity android:name=".Game2048Activity" android:exported="true" />
+        <activity android:name=".FlappyBirdActivity" android:exported="true" />
     </application>
 
 </manifest>
