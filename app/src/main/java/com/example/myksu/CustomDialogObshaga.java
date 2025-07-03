@@ -13,20 +13,24 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.InputStream;
+import java.util.List;
 
 public class CustomDialogObshaga extends DialogFragment {
 
     private static final String ARG_DORMITORY_ID = "dormitory_id";
     private int dormitoryId;
     ProgressManager progressManager;
+    private LatLng dormitoryLocation;
 
-    // Создаем новый экземпляр с передачей ID
     public static CustomDialogObshaga newInstance(int dormitoryId) {
         CustomDialogObshaga fragment = new CustomDialogObshaga();
         Bundle args = new Bundle();
@@ -104,6 +108,12 @@ public class CustomDialogObshaga extends DialogFragment {
                     instituteText.setVisibility(View.GONE);
                 }
 
+                // Получаем координаты общежития
+                List<LatLng> dormitoryLocations = getDormitoryLocations();
+                if (dormitoryId > 0 && dormitoryId <= dormitoryLocations.size()) {
+                    dormitoryLocation = dormitoryLocations.get(dormitoryId - 1);
+                }
+
                 // Настройка кнопок
                 ImageButton detailsButton = view.findViewById(R.id.detailsButton);
                 detailsButton.setOnClickListener(v -> {
@@ -118,8 +128,17 @@ public class CustomDialogObshaga extends DialogFragment {
 
                 ImageButton routeButton = view.findViewById(R.id.routeButton);
                 routeButton.setOnClickListener(v -> {
-                    // Обработка нажатия "Маршрут"
-
+                    if (dormitoryLocation != null) {
+                        if (getActivity() instanceof MapActivity) {
+                            MapActivity mapActivity = (MapActivity) getActivity();
+                            mapActivity.getRouteManager().buildRouteToDormitory(dormitoryLocation);
+                            dismiss();
+                        } else {
+                            Toast.makeText(getContext(), "Ошибка: активность не является MapActivity", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Не удалось определить расположение общежития", Toast.LENGTH_SHORT).show();
+                    }
                 });
             } else {
                 Toast.makeText(getContext(), "Данные об общежитии не найдены", Toast.LENGTH_SHORT).show();
@@ -131,6 +150,16 @@ public class CustomDialogObshaga extends DialogFragment {
         }
     }
 
+    private List<LatLng> getDormitoryLocations() {
+        return Arrays.asList(
+                new LatLng(57.754431, 40.952182), // Общежитие №1
+                new LatLng(57.753951, 40.954221), // Общежитие №2
+                new LatLng(57.736553, 40.920300), // Общежитие №3
+                new LatLng(57.755104, 40.955613), // Общежитие №4
+                new LatLng(57.755233, 40.954607), // Общежитие №5
+                new LatLng(57.767923, 40.918962)  // Общежитие №6
+        );
+    }
 
     @Override
     public void onStart() {
