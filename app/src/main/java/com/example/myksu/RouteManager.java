@@ -2,6 +2,8 @@ package com.example.myksu;
 
 import android.graphics.Color;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -36,6 +38,7 @@ public class RouteManager {
     private GoogleMap mMap;
     private Polyline currentRoute;
     private final OkHttpClient httpClient;
+    private ImageButton hideRouteButton;
 
     public RouteManager(MapActivity activity) {
         this.activity = activity;
@@ -48,12 +51,22 @@ public class RouteManager {
 
     public void initWithMap(GoogleMap map) {
         this.mMap = map;
+        initHideRouteButton();
+    }
+
+    private void initHideRouteButton() {
+        hideRouteButton = activity.findViewById(R.id.btn_hide_route);
+        hideRouteButton.setVisibility(View.GONE);
+        hideRouteButton.setOnClickListener(v -> clearRoute());
     }
 
     public void clearRoute() {
         if (currentRoute != null) {
             currentRoute.remove();
             currentRoute = null;
+        }
+        if (hideRouteButton != null) {
+            hideRouteButton.setVisibility(View.GONE);
         }
     }
 
@@ -123,7 +136,12 @@ public class RouteManager {
                         return;
                     }
 
-                    activity.runOnUiThread(() -> drawRoute(path));
+                    activity.runOnUiThread(() -> {
+                        drawRoute(path);
+                        if (hideRouteButton != null) {
+                            hideRouteButton.setVisibility(View.VISIBLE);
+                        }
+                    });
 
                 } catch (Exception e) {
                     Log.e(TAG, "Error processing route", e);
