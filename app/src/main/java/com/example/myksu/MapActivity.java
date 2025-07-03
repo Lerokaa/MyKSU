@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -23,6 +25,10 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private RouteManager routeManager;
     private DialogManager dialogManager;
     private ProgressManager progressManager;
+    private ProgressBar progressBar;
+    private  SettingsProgress settingsProgress;
+    private  SettingsCurrentTask settingsCurrentTask;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +37,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
         progressManager = ProgressManager.getInstance();
         progressManager.loadProgress(this);
+
+        ProgressBar myProgressBar = findViewById(R.id.progress);
+        SettingsProgress settingsProgress = new SettingsProgress(myProgressBar, this);
+        settingsProgress.SetProgressBar();
+
+        TextView textView = findViewById(R.id.task_description);
+        SettingsCurrentTask settingsCurrentTask = new SettingsCurrentTask(textView, this);
+        settingsCurrentTask.SetTask();
 
         // Инициализация компонентов
         locationManager = new LocationManager(this);
